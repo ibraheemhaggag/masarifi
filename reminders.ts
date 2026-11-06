@@ -9,8 +9,14 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
+// Only the Masarifi web app may call this function from a browser.
+const APP_ORIGIN = "https://ibraheemhaggag.github.io";
+// Push messages are only ever sent to real browser push services (blocks SSRF via fake endpoints).
+const PUSH_HOSTS = /^(fcm\.googleapis\.com|android\.googleapis\.com|updates\.push\.services\.mozilla\.com|push\.services\.mozilla\.com|web\.push\.apple\.com|[a-z0-9-]+\.notify\.windows\.com)$/;
+const safeEndpoint = (u: string) => { try { const x = new URL(u); return x.protocol === "https:" && PUSH_HOSTS.test(x.hostname); } catch { return false; } };
 const cors = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": APP_ORIGIN,
+  "Vary": "Origin",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-user-token",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
@@ -86,6 +92,10 @@ async function send(subs: Sub[], payload: Record<string, unknown>) {
   const app = await server();
   let sent = 0;
   for (const s of subs) {
+    if (!safeEndpoint(s.endpoint) || !s.subscription?.keys?.p256dh || !s.subscription?.keys?.auth) {
+      await db.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
+      continue;
+    }
     try {
       await app.subscribe(s.subscription).pushTextMessage(JSON.stringify(payload), { ttl: 86400 } as webpush.PushMessageOptions);
       sent++;
@@ -96,6 +106,15 @@ async function send(subs: Sub[], payload: Record<string, unknown>) {
     }
   }
   return sent;
+}
+
+// The daily job runs at most once every 12 hours, however often it is called.
+async function claimDailyRun() {
+  const now = Date.now();
+  const { data } = await db.from("push_config").select("value").eq("key", "last_run").maybeSingle();
+  if (data && now - Number(data.value?.at || 0) < 12 * 3600 * 1000) return false;
+  await db.from("push_config").upsert({ key: "last_run", value: { at: now } });
+  return true;
 }
 
 async function runDaily() {
@@ -141,6 +160,7 @@ Deno.serve(async (req) => {
       await server();
       return json({ key: publicKey });
     }
+    if (req.method === "POST" && Number(req.headers.get("content-length") || 0) > 4096) return json({ error: "too large" }, 413);
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     if (body.action === "test") {
       // The gateway accepts the public anon key; the signed-in user's token travels in x-user-token and is verified here.
@@ -151,14 +171,22 @@ Deno.serve(async (req) => {
       const { data: subs } = await db.from("push_subscriptions").select("endpoint,user_id,subscription,lang,tz").eq("user_id", u.user.id);
       const list = (subs ?? []) as Sub[];
       if (!list.length) return json({ error: "no devices" }, 404);
+      // at most one test notification per user per minute
+      const tk = "test_" + u.user.id;
+      const { data: last } = await db.from("push_config").select("value").eq("key", tk).maybeSingle();
+      if (last && Date.now() - Number(last.value?.at || 0) < 60000) return json({ error: "too many requests" }, 429);
+      await db.from("push_config").upsert({ key: tk, value: { at: Date.now() } });
       const lg = langOf(list[0].lang);
       const sent = await send(list, { title: "Masarifi", body: MSG[lg].test, tag: "test", url: "./", lang: lg, dir: lg === "ar" ? "rtl" : "ltr" });
       return json({ sent });
     }
-    if (body.action === "run") return json(await runDaily());
+    if (body.action === "run") {
+      if (!(await claimDailyRun())) return json({ skipped: true });
+      return json(await runDaily());
+    }
     return json({ error: "unknown action" }, 400);
   } catch (e) {
     console.error(e);
-    return json({ error: String(e) }, 500);
+    return json({ error: "server error" }, 500);
   }
 });

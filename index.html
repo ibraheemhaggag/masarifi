@@ -2,6 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ 'sha256-9HXO0M+GULA5wMC17g+x31zGrwyrYLZd0bcdHkSq8CI=' 'sha256-tHiErIhihElN/0v/7y1/rpTbk3glYcWvOih3aW/j1Yg=' 'sha256-ADi4E6eCQX7KvNgc8ravF0AVeJ9bnwktz4IrWyB2U8Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://qbiqyhpvooldrjuqwihz.supabase.co wss://qbiqyhpvooldrjuqwihz.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<script>if(window.top!==window.self){document.documentElement.style.display="none";try{window.top.location.replace(window.self.location.href)}catch(e){}}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Masarifi</title>
 <meta name="theme-color" content="#e8f2ff">
@@ -13,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
@@ -364,7 +367,7 @@ button,a,label{touch-action:manipulation}
     </div>
     <div class="field"><label for="aUser" data-i="username"></label><input type="text" id="aUser" autocomplete="username" autocapitalize="none" spellcheck="false" dir="ltr"></div>
     <div class="field"><label for="aPass" data-i="password"></label><div class="pwwrap"><input type="password" id="aPass" autocomplete="current-password" dir="ltr"><button type="button" id="pwShow" data-i="show"></button></div></div>
-    <div class="field" id="aPass2Wrap" hidden><label for="aPass2" data-i="password2"></label><input type="password" id="aPass2" autocomplete="new-password" dir="ltr"></div>
+    <div class="field" id="aPass2Wrap" hidden><label for="aPass2" data-i="password2"></label><input type="password" id="aPass2" autocomplete="new-password" dir="ltr" maxlength="72"></div>
     <p class="msg neg" id="authErr" hidden></p>
     <button class="btn primary block" type="submit" id="authSubmit"></button>
     <p class="note" id="authHint"></p>
@@ -567,7 +570,7 @@ button,a,label{touch-action:manipulation}
     <div class="setgroup" id="passGroup" hidden>
       <h4 data-i="chgPass"></h4>
       <div class="field"><label for="curPass" data-i="curPass"></label><input type="password" id="curPass" autocomplete="current-password" dir="ltr"></div>
-      <div class="field"><label for="newPass" data-i="newPass"></label><input type="password" id="newPass" autocomplete="new-password" dir="ltr"></div>
+      <div class="field"><label for="newPass" data-i="newPass"></label><input type="password" id="newPass" autocomplete="new-password" dir="ltr" maxlength="72"></div>
       <div class="field"><label for="newPass2" data-i="newPass2"></label><input type="password" id="newPass2" autocomplete="new-password" dir="ltr"></div>
       <p class="msg" id="passMsg" hidden></p>
       <button class="btn primary block" type="button" id="chgPass" data-i="chgPass"></button>
@@ -663,7 +666,7 @@ button,a,label{touch-action:manipulation}
       stFail:"تعذّر الحفظ على حسابك — البيانات محفوظة على هذا الجهاز لحد ما النت يرجع", stUnreach:"تعذّر الوصول للبيانات المحفوظة الآن",
       login:"دخول", register:"حساب جديد", username:"اسم المستخدم", password:"كلمة المرور", password2:"أكد كلمة المرور", show:"إظهار", hide:"إخفاء",
       doLogin:"دخول", doRegister:"إنشاء الحساب", userHint:"اسم المستخدم بالإنجليزي: حروف وأرقام و _ أو . (من ٣ لـ ٢٠)",
-      errUser:"اسم المستخدم لازم يكون من ٣ لـ ٢٠ حرف إنجليزي أو رقم أو _ أو .", errPass:"كلمة المرور لازم تكون ٦ حروف على الأقل.", errMatch:"كلمتين المرور مش زي بعض.",
+      errUser:"اسم المستخدم لازم يكون من ٣ لـ ٢٠ حرف إنجليزي أو رقم أو _ أو .", errPass:"كلمة المرور لازم تكون ٨ حروف على الأقل وفيها حروف إنجليزي وأرقام.", errLocked:n=>"محاولات غلط كتير. استنى "+n+" ثانية وجرّب تاني.", errRate:"طلبات كتير في وقت قصير. استنى شوية وجرّب تاني.", passOthers:"اتغيرت كلمة المرور واتعمل تسجيل خروج من باقي الأجهزة.", errMatch:"كلمتين المرور مش زي بعض.",
       errCreds:"اسم المستخدم أو كلمة المرور غلط.", errTaken:"اسم المستخدم ده مستخدم قبل كده، اختار اسم تاني.", errConfirm:"الحساب اتعمل بس محتاج تفعيل. لازم تقفل خاصية Confirm email في إعدادات Supabase.",
       errNet:"مفيش اتصال بالسيرفر. اتأكد من النت وجرّب تاني.", errGeneric:"حصلت مشكلة، جرّب تاني.", wait:"لحظة…",
       signedInAs:"داخل باسم", newPass:"كلمة مرور جديدة", chgPass:"غيّر كلمة المرور", passChanged:"اتغيرت كلمة المرور.", logout:"تسجيل خروج",
@@ -717,7 +720,7 @@ button,a,label{touch-action:manipulation}
       stFail:"Couldn't save to your account — kept on this device until you're back online", stUnreach:"Can't reach saved data right now",
       login:"Sign in", register:"New account", username:"Username", password:"Password", password2:"Confirm password", show:"Show", hide:"Hide",
       doLogin:"Sign in", doRegister:"Create account", userHint:"Username: English letters, digits, _ or . (3–20)",
-      errUser:"Username must be 3–20 English letters, digits, _ or .", errPass:"Password must be at least 6 characters.", errMatch:"Passwords don't match.",
+      errUser:"Username must be 3–20 English letters, digits, _ or .", errPass:"Password must be at least 8 characters and include letters and numbers.", errLocked:n=>"Too many failed attempts. Wait "+n+" seconds and try again.", errRate:"Too many requests. Wait a moment and try again.", passOthers:"Password changed and other devices were signed out.", errMatch:"Passwords don't match.",
       errCreds:"Wrong username or password.", errTaken:"That username is taken — pick another.", errConfirm:"Account created but needs confirmation. Turn off “Confirm email” in your Supabase settings.",
       errNet:"Can't reach the server. Check your connection and try again.", errGeneric:"Something went wrong, try again.", wait:"One moment…",
       signedInAs:"Signed in as", newPass:"New password", chgPass:"Change password", passChanged:"Password changed.", logout:"Sign out",
@@ -771,7 +774,7 @@ button,a,label{touch-action:manipulation}
       stFail:"Speichern im Konto fehlgeschlagen – bleibt auf diesem Gerät, bis du wieder online bist", stUnreach:"Gespeicherte Daten sind gerade nicht erreichbar",
       login:"Anmelden", register:"Neues Konto", username:"Benutzername", password:"Passwort", password2:"Passwort bestätigen", show:"Anzeigen", hide:"Verbergen",
       doLogin:"Anmelden", doRegister:"Konto erstellen", userHint:"Benutzername: lateinische Buchstaben, Ziffern, _ oder . (3–20)",
-      errUser:"Der Benutzername muss 3–20 lateinische Buchstaben, Ziffern, _ oder . enthalten.", errPass:"Das Passwort muss mindestens 6 Zeichen haben.", errMatch:"Die Passwörter stimmen nicht überein.",
+      errUser:"Der Benutzername muss 3–20 lateinische Buchstaben, Ziffern, _ oder . enthalten.", errPass:"Das Passwort muss mindestens 8 Zeichen lang sein und Buchstaben sowie Ziffern enthalten.", errLocked:n=>"Zu viele Fehlversuche. Warte "+n+" Sekunden und versuche es erneut.", errRate:"Zu viele Anfragen. Warte kurz und versuche es erneut.", passOthers:"Passwort geändert, andere Geräte wurden abgemeldet.", errMatch:"Die Passwörter stimmen nicht überein.",
       errCreds:"Benutzername oder Passwort ist falsch.", errTaken:"Dieser Benutzername ist vergeben – wähle einen anderen.", errConfirm:"Konto erstellt, muss aber bestätigt werden. Deaktiviere „Confirm email“ in den Supabase-Einstellungen.",
       errNet:"Server nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.", errGeneric:"Etwas ist schiefgelaufen, versuche es erneut.", wait:"Einen Moment…",
       signedInAs:"Angemeldet als", newPass:"Neues Passwort", chgPass:"Passwort ändern", passChanged:"Passwort geändert.", logout:"Abmelden",
@@ -939,6 +942,7 @@ button,a,label{touch-action:manipulation}
     if(m.includes("invalid login")) return "errCreds";
     if(m.includes("already registered")||m.includes("already exists")) return "errTaken";
     if(m.includes("password")) return "errPass";
+    if(m.includes("rate limit")||m.includes("too many")) return "errRate";
     if(m.includes("fetch")||m.includes("network")) return "errNet";
     return "errGeneric";
   }
@@ -946,8 +950,10 @@ button,a,label{touch-action:manipulation}
     e.preventDefault();
     const u=$("aUser").value.trim(), p=$("aPass").value;
     if(!/^[A-Za-z0-9_.]{3,20}$/.test(u)) return authError("errUser");
-    if(p.length<6) return authError("errPass");
+    if(!p) return authError("errCreds");
+    if(authMode==="register"&&!strongPass(p)) return authError("errPass");
     if(authMode==="register" && p!==$("aPass2").value) return authError("errMatch");
+    const wait=lockLeft(); if(wait){ const el=$("authErr"); el.textContent=T("errLocked")(wait); el.hidden=false; return; }
     const btn=$("authSubmit"); btn.disabled=true; btn.textContent=T("wait"); $("authErr").hidden=true;
     try{
       if(authMode==="register"){
@@ -957,13 +963,21 @@ button,a,label{touch-action:manipulation}
         await enterUser(data.session.user);
       } else {
         const {data,error}=await sb.auth.signInWithPassword({email:toEmail(u),password:p});
-        if(error) throw error;
+        if(error){ if(mapErr(error)==="errCreds") noteFail(); throw error; }
+        clearFails();
         await enterUser(data.user);
       }
       $("aPass").value=""; $("aPass2").value="";
     }catch(err){ authError(mapErr(err)); }
     finally{ btn.disabled=false; btn.textContent=T(authMode==="register"?"doRegister":"doLogin"); }
   });
+  /* brute-force slowdown: after 5 wrong passwords, wait 30s, doubling each time (server limits still apply) */
+  const strongPass=p=>p.length>=8&&p.length<=72&&/[A-Za-z]/.test(p)&&/\d/.test(p);
+  const FAILK="masarifi_fails";
+  const failState=()=>{ try{ return JSON.parse(localStorage.getItem(FAILK)||"{}"); }catch(e){ return {}; } };
+  function noteFail(){ const f=failState(); f.n=(f.n||0)+1; if(f.n>=5){ f.until=Date.now()+30000*Math.pow(2,Math.min(f.n-5,5)); } try{ localStorage.setItem(FAILK,JSON.stringify(f)); }catch(e){} }
+  function clearFails(){ try{ localStorage.removeItem(FAILK); }catch(e){} }
+  function lockLeft(){ const f=failState(); return f.until&&f.until>Date.now()?Math.ceil((f.until-Date.now())/1000):0; }
   const usernameOf=u=>(u.user_metadata&&u.user_metadata.username)||String(u.email||"").split("@")[0];
 
   /* ================= theme & language ================= */
@@ -1592,6 +1606,7 @@ button,a,label{touch-action:manipulation}
   };
   $("impFile").addEventListener("change",e=>{
     const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+    if(f.size>2000000) return showSetMsg(T("badFile"),true);
     const r=new FileReader();
     r.onload=()=>{ let parsed=null; try{ parsed=normalize(JSON.parse(r.result)); }catch(err){}
       const n=parsed?Object.keys(parsed.months).length:0, box=$("impConfirm"); box.innerHTML="";
@@ -1643,7 +1658,7 @@ button,a,label{touch-action:manipulation}
   $("chgPass").onclick=async()=>{
     const c=$("curPass").value, p=$("newPass").value, p2=$("newPass2").value;
     if(!c) return setMsg("passMsg",T("errCurPass"),true);
-    if(p.length<6) return setMsg("passMsg",T("errPass"),true);
+    if(!strongPass(p)) return setMsg("passMsg",T("errPass"),true);
     if(p!==p2) return setMsg("passMsg",T("errMatch"),true);
     if(p===c) return setMsg("passMsg",T("passSame"),true);
     const btn=$("chgPass"); btn.disabled=true; btn.textContent=T("wait");
@@ -1651,7 +1666,8 @@ button,a,label{touch-action:manipulation}
       await verifyPassword(c);
       const {error}=await sb.auth.updateUser({password:p}); if(error) throw mapErr(error);
       ["curPass","newPass","newPass2"].forEach(i=>$(i).value="");
-      setMsg("passMsg",T("passChanged"),false);
+      try{ await sb.auth.signOut({scope:"others"}); }catch(_){}
+      setMsg("passMsg",T("passOthers"),false);
     }catch(k){ setMsg("passMsg",T(typeof k==="string"?k:"errGeneric"),true); }
     finally{ btn.disabled=false; btn.textContent=T("chgPass"); }
   };
