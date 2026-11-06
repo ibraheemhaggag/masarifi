@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ 'sha256-9HXO0M+GULA5wMC17g+x31zGrwyrYLZd0bcdHkSq8CI=' 'sha256-tHiErIhihElN/0v/7y1/rpTbk3glYcWvOih3aW/j1Yg=' 'sha256-ADi4E6eCQX7KvNgc8ravF0AVeJ9bnwktz4IrWyB2U8Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://qbiqyhpvooldrjuqwihz.supabase.co wss://qbiqyhpvooldrjuqwihz.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ 'sha256-9HXO0M+GULA5wMC17g+x31zGrwyrYLZd0bcdHkSq8CI=' 'sha256-Rf7k0guCxR74lN1MFxpJ2WsBu/wE8poHGuSFG95JBpo=' 'sha256-ADi4E6eCQX7KvNgc8ravF0AVeJ9bnwktz4IrWyB2U8Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://qbiqyhpvooldrjuqwihz.supabase.co wss://qbiqyhpvooldrjuqwihz.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <script>if(window.top!==window.self){document.documentElement.style.display="none";try{window.top.location.replace(window.self.location.href)}catch(e){}}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -1834,7 +1834,14 @@ button,a,label{touch-action:manipulation}
   applyTheme(); applyLang();
   (async function boot(){
     await null;
-    if(CFG&&CFG.supabaseUrl&&CFG.supabaseAnonKey&&!/YOUR_/.test(CFG.supabaseUrl+CFG.supabaseAnonKey)&&window.supabase){ try{ await startSupabase(); }catch(e){ startLocal(); } }
+    const configured=CFG&&CFG.supabaseUrl&&CFG.supabaseAnonKey&&!/YOUR_/.test(CFG.supabaseUrl+CFG.supabaseAnonKey);
+    if(configured&&!window.supabase){
+      // the sign-in library didn't load (stale offline cache or network): clear the app cache and retry once
+      let healed=false; try{ healed=!!sessionStorage.getItem("masarifi_heal"); sessionStorage.setItem("masarifi_heal","1"); }catch(e){}
+      if(!healed&&"caches" in window){ try{ for(const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); for(const k of await caches.keys()) await caches.delete(k); }catch(e){} location.reload(); return; }
+      showAuth(); authError("errNet"); return;
+    }
+    if(configured){ try{ await startSupabase(); }catch(e){ showAuth(); authError("errNet"); } }
     else if(window.claude&&window.claude.use) await startClaude();
     else startLocal();
   })();
