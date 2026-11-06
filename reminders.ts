@@ -11,7 +11,7 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-user-token",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 const json = (body: unknown, status = 200) =>
@@ -143,7 +143,9 @@ Deno.serve(async (req) => {
     }
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     if (body.action === "test") {
-      const jwt = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+      // The gateway accepts the public anon key; the signed-in user's token travels in x-user-token and is verified here.
+      const jwt = req.headers.get("x-user-token") ?? "";
+      if (!jwt) return json({ error: "not signed in" }, 401);
       const { data: u } = await db.auth.getUser(jwt);
       if (!u?.user) return json({ error: "not signed in" }, 401);
       const { data: subs } = await db.from("push_subscriptions").select("endpoint,user_id,subscription,lang,tz").eq("user_id", u.user.id);
