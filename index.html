@@ -306,6 +306,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulati
 html,body{overflow-x:hidden;max-width:100%}
 input,select,textarea,.field input[type=text],.field input[type=number],.field input[type=password],.field input[type=date]{font-size:16px}
 button,a,label{touch-action:manipulation}
+/* keep every column inside the screen; wide rows (filter chips) scroll inside themselves */
+.wrap{width:100%;min-width:0}
+.wrap>*{min-width:0;max-width:100%}
+.filters{max-width:100%}
 </style>
 <!-- AUTH -->
 <div class="wrap auth" id="auth" hidden>
