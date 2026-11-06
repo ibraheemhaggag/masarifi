@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>مصاريفي</title>
+<title>Masarifi</title>
 <meta name="theme-color" content="#e8f2ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="مصاريفي">
+<meta name="apple-mobile-web-app-title" content="Masarifi">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -310,6 +310,45 @@ button,a,label{touch-action:manipulation}
 .wrap{width:100%;min-width:0}
 .wrap>*{min-width:0;max-width:100%}
 .filters{max-width:100%}
+/* v2: selection, switches, lock, toast */
+.list-head .lh-r{display:flex;gap:12px;align-items:baseline}
+.selbtn{background:none;border:none;color:var(--accent);font-weight:600;font-size:.85rem;padding:2px 0}
+.item .selbox{flex:none;width:28px;height:28px;border-radius:9px;border:2px solid var(--line);display:none;place-items:center;background:transparent;padding:0}
+.item .selbox svg{width:15px;height:15px;opacity:0}
+.list.selecting .item .selbox{display:grid}
+.list.selecting .item .check{display:none}
+.list.selecting .item{cursor:pointer}
+.item.is-sel{box-shadow:0 0 0 2px var(--accent),var(--glass-shadow)}
+.item.is-sel .selbox{background:var(--accent);border-color:var(--accent)}
+.item.is-sel .selbox svg{opacity:1}
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--surface-2);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border-top:1px solid var(--glass-border);box-shadow:0 -6px 24px rgba(12,33,66,.12)}
+.selbar .in{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.selbar .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.selbar .row .btn{flex:1;min-width:0}
+.selbar .btn:disabled{opacity:.45}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.toggle-row b{display:block;font-weight:600;font-size:.92rem}
+.toggle-row p{margin:2px 0 0;font-size:.8rem;color:var(--muted)}
+.switch{position:relative;width:50px;height:30px;flex:none;display:inline-block}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked+span{background:var(--accent)}
+.switch input:checked+span::after{transform:translateX(20px)}
+.switch input:disabled+span{opacity:.45}
+.switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.setgroup h4{margin:0;font-family:var(--display);font-size:.98rem;font-weight:600}
+.setgroup.danger-zone{border-top-color:color-mix(in srgb,var(--late) 40%,transparent)}
+.setgroup.danger-zone h4{color:var(--late)}
+.lock{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));background:var(--bg)}
+.lock .card{width:100%;max-width:360px;align-items:center;text-align:center;gap:14px}
+.lock .logo{width:68px;height:68px;border-radius:22px;background:linear-gradient(135deg,var(--blob2),var(--accent));display:grid;place-items:center;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.5)}
+.lock .logo svg{width:34px;height:34px}
+.lock h1{margin:0;font-family:var(--display);font-size:1.35rem}
+.lock p{margin:0;color:var(--muted);font-size:.9rem}
+.ratio .top2{flex-wrap:wrap;row-gap:4px}
+.ratio .top2 .label{min-width:0;overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:70;max-width:calc(100% - 32px);padding:10px 16px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:.88rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);text-align:center}
 </style>
 <!-- AUTH -->
 <div class="wrap auth" id="auth" hidden>
@@ -383,7 +422,7 @@ button,a,label{touch-action:manipulation}
         <div class="stack" id="catStack" aria-hidden="true"></div>
         <div class="catrows" id="catRows"></div>
       </section>
-      <div class="list-head"><h2 data-i="obligations"></h2><span id="countV"></span></div>
+      <div class="list-head"><h2 data-i="obligations"></h2><span class="lh-r"><span id="countV"></span><button class="selbtn" id="selBtn" type="button" hidden></button></span></div>
       <div class="filters" id="filters" role="group"></div>
       <ul class="list" id="list"></ul>
       <div id="emptyBox"></div>
@@ -453,6 +492,24 @@ button,a,label{touch-action:manipulation}
 </div>
 
 <button class="fab" id="addBtn" type="button" hidden><span aria-hidden="true">＋</span> <span id="fabLabel"></span></button>
+<div class="selbar" id="selBar" hidden>
+  <div class="in">
+    <div class="row"><b id="selCount"></b><button class="selbtn" id="selAll" type="button"></button></div>
+    <div id="selConfirm"></div>
+    <div class="row"><button class="btn danger" id="selDel" type="button"></button><button class="btn ghost" id="selCancel" type="button" data-i="cancel"></button></div>
+  </div>
+</div>
+<div class="lock" id="lockScreen" hidden>
+  <div class="card">
+    <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/><circle cx="12" cy="15.5" r="1.4" fill="#fff"/></svg></span>
+    <h1 data-i="lockTitle"></h1>
+    <p data-i="lockSub"></p>
+    <button class="btn primary block" type="button" id="unlockBtn" data-i="unlock"></button>
+    <p class="msg neg" id="lockErr" hidden></p>
+    <button class="linkbtn" type="button" id="lockOut" data-i="lockSignOut"></button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <div class="scrim" id="scrim" hidden></div>
 
 <!-- obligation / salary / budget sheet -->
@@ -505,13 +562,30 @@ button,a,label{touch-action:manipulation}
     <h3 id="setTitle" data-i="settings"></h3>
     <div class="setgroup" id="acctGroup" hidden style="border-top:none;padding-top:0">
       <div class="acct"><span class="av" id="acctAv"></span><div><span class="label" data-i="signedInAs"></span><div style="font-weight:600" id="acctName" dir="ltr"></div></div></div>
+      <button class="btn ghost block" type="button" id="logoutBtn" data-i="logout"></button>
+    </div>
+    <div class="setgroup" id="passGroup" hidden>
+      <h4 data-i="chgPass"></h4>
+      <div class="field"><label for="curPass" data-i="curPass"></label><input type="password" id="curPass" autocomplete="current-password" dir="ltr"></div>
       <div class="field"><label for="newPass" data-i="newPass"></label><input type="password" id="newPass" autocomplete="new-password" dir="ltr"></div>
-      <button class="btn ghost block" type="button" id="chgPass" data-i="chgPass"></button>
-      <button class="btn danger block" type="button" id="logoutBtn" data-i="logout"></button>
+      <div class="field"><label for="newPass2" data-i="newPass2"></label><input type="password" id="newPass2" autocomplete="new-password" dir="ltr"></div>
+      <p class="msg" id="passMsg" hidden></p>
+      <button class="btn primary block" type="button" id="chgPass" data-i="chgPass"></button>
+    </div>
+    <div class="setgroup" id="secGroup" hidden>
+      <h4 data-i="security"></h4>
+      <div class="toggle-row"><div><b data-i="bioToggle"></b><p data-i="bioNote"></p></div><label class="switch"><input type="checkbox" id="bioSw"><span></span></label></div>
+      <p class="msg" id="bioMsg" hidden></p>
+    </div>
+    <div class="setgroup" id="notifGroup" hidden>
+      <h4 data-i="notifs"></h4>
+      <div class="toggle-row"><div><b data-i="notifToggle"></b><p data-i="notifNote"></p></div><label class="switch"><input type="checkbox" id="notifSw"><span></span></label></div>
+      <p class="msg" id="notifMsg" hidden></p>
+      <button class="btn ghost block" type="button" id="notifTest" data-i="notifTest" hidden></button>
     </div>
     <div class="setgroup" id="langGroup">
       <span class="label" data-i="language"></span>
-      <div class="seg" id="segLang"><button type="button" data-v="ar">العربية</button><button type="button" data-v="en">English</button></div>
+      <div class="seg" id="segLang"><button type="button" data-v="ar">العربية</button><button type="button" data-v="en">English</button><button type="button" data-v="de">Deutsch</button></div>
     </div>
     <div class="setgroup">
       <span class="label" data-i="appearance"></span>
@@ -529,6 +603,16 @@ button,a,label{touch-action:manipulation}
       <input type="file" id="impFile" accept=".json,application/json" hidden>
       <div id="impConfirm"></div>
     </div>
+    <div class="setgroup danger-zone" id="delGroup" hidden>
+      <h4 data-i="delAccT"></h4>
+      <p data-i="delAccNote"></p>
+      <button class="btn danger block" type="button" id="delAccBtn" data-i="delAccBtn"></button>
+      <div id="delAccBox" hidden style="display:flex;flex-direction:column;gap:10px">
+        <div class="field"><label for="delPass" data-i="delAccPass"></label><input type="password" id="delPass" autocomplete="current-password" dir="ltr"></div>
+        <p class="msg neg" id="delMsg" hidden></p>
+        <button class="btn danger block" type="button" id="delAccYes" data-i="delAccYes"></button>
+      </div>
+    </div>
     <p class="msg" id="setMsg" hidden></p>
     <button class="btn ghost block" type="button" data-close data-i="close"></button>
   </div>
@@ -542,7 +626,7 @@ button,a,label{touch-action:manipulation}
   /* ================= i18n ================= */
   const I = {
     ar:{
-      title:"مصاريفي", appName:"مصاريفي", tagline:"التزاماتك ومصاريفك اليومية في مكان واحد", tabMonth:"الشهر", tabAna:"التحليل", tabHist:"السجل",
+      title:"Masarifi", appName:"Masarifi", tagline:"التزاماتك ومصاريفك اليومية في مكان واحد", tabMonth:"الشهر", tabAna:"التحليل", tabHist:"السجل",
       disclaimer:"التحليل استرشادي ومبني على نسب شائعة في التخطيط المالي الشخصي، ومش استشارة مالية.",
       leftSalary:"الباقي من الراتب", salary:"الراتب", edit:"تعديل", paid:"التزامات اتسددت", due:"التزامات باقية", daily:"مصاريف يومية", free:"فايض بعد الكل",
       byCat:"حسب التصنيف", paidOfTotal:"مسدد / إجمالي", obligations:"الالتزامات", dailyTab:"المصاريف اليومية", total:"الإجمالي",
@@ -559,7 +643,7 @@ button,a,label{touch-action:manipulation}
       backup:"النسخ الاحتياطي", expJson:"تنزيل نسخة احتياطية (JSON)", expCsv:"تصدير السجل كجدول (CSV)",
       impNote:"استرجاع نسخة احتياطية هيستبدل البيانات الحالية بالكامل.", impBtn:"اختار ملف النسخة الاحتياطية",
       cur:"ر.س", addSalary:"أضف الراتب", curMonth:"الشهر الحالي", pastMonth:"شهر سابق", nextMonth:"شهر قادم",
-      prevAria:"الشهر السابق", nextAria:"الشهر التالي", settingsAria:"الإعدادات", langAria:"Switch to English", themeAria:"تبديل الوضع الليلي والنهاري",
+      prevAria:"الشهر السابق", nextAria:"الشهر التالي", settingsAria:"الإعدادات", langAria:"تغيير اللغة", themeAria:"تبديل الوضع الليلي والنهاري",
       markPaid:"تم السداد", unmarkPaid:"إلغاء السداد",
       left:(u,n)=>"باقي "+u+" من "+n, allPaid:"كله اتسدد ✓", lateBy:d=>"متأخر "+d+" يوم", dueToday:"مستحق النهارده", inDays:d=>"بعد "+d+" يوم",
       day:d=>"يوم "+d, monthly:"شهري", all:"الكل", salaryOf:m=>"راتب "+m, salaryField:"راتب الشهر (ر.س)", budgetField:"الميزانية الشهرية (ر.س)",
@@ -583,6 +667,12 @@ button,a,label{touch-action:manipulation}
       errCreds:"اسم المستخدم أو كلمة المرور غلط.", errTaken:"اسم المستخدم ده مستخدم قبل كده، اختار اسم تاني.", errConfirm:"الحساب اتعمل بس محتاج تفعيل. لازم تقفل خاصية Confirm email في إعدادات Supabase.",
       errNet:"مفيش اتصال بالسيرفر. اتأكد من النت وجرّب تاني.", errGeneric:"حصلت مشكلة، جرّب تاني.", wait:"لحظة…",
       signedInAs:"داخل باسم", newPass:"كلمة مرور جديدة", chgPass:"غيّر كلمة المرور", passChanged:"اتغيرت كلمة المرور.", logout:"تسجيل خروج",
+      account:"الحساب", curPass:"كلمة المرور الحالية", newPass2:"أكد كلمة المرور الجديدة", errCurPass:"كلمة المرور الحالية غلط.", passSame:"كلمة المرور الجديدة لازم تختلف عن الحالية.",
+      delAccT:"حذف الحساب", delAccNote:"هيتحذف حسابك وكل بياناته نهائياً، ومش هتقدر ترجّعها.", delAccBtn:"احذف حسابي", delAccPass:"اكتب كلمة المرور للتأكيد", delAccYes:"احذف نهائياً", accDeleted:"اتحذف حسابك.",
+      security:"الأمان", bioToggle:"فتح التطبيق بالبصمة / Face ID", bioNote:"هيطلب بصمتك أو وشّك كل ما تفتح التطبيق على الجهاز ده.", bioOn:"فتح التطبيق بالبصمة شغّال.", bioOff:"فتح التطبيق بالبصمة متوقف.", bioFail:"ماقدرناش نتحقق، جرّب تاني.", bioUnsupported:"الجهاز أو المتصفح ده مش بيدعم الفتح بالبصمة.",
+      lockTitle:"التطبيق مقفول", lockSub:"استخدم البصمة أو Face ID عشان تكمّل", unlock:"افتح", lockSignOut:"تسجيل خروج بدل كده",
+      notifs:"التنبيهات", notifToggle:"تنبيه قبل الاستحقاق بـ ٣ أيام", notifNote:"هيوصلك إشعار قبل ميعاد كل التزام مش متسدد بـ ٣ أيام.", notifInstall:"على الآيفون: ضيف التطبيق للشاشة الرئيسية الأول، وبعدين شغّل التنبيهات من التطبيق المثبت.", notifDenied:"الإشعارات مقفولة. اسمح بيها لـ Masarifi من إعدادات الموبايل.", notifOn:"التنبيهات شغّالة.", notifOff:"التنبيهات متوقفة.", notifTest:"ابعت إشعار تجربة", notifSent:"اتبعت إشعار التجربة.", notifUnsupported:"المتصفح ده مش بيدعم الإشعارات.", notifNeedAcct:"التنبيهات محتاجة حساب. استخدم التطبيق المثبت بعد تسجيل الدخول.", notifFail:"ماقدرناش نشغّل التنبيهات دلوقتي، جرّب تاني.",
+      select:"تحديد", selectAll:"تحديد الكل", clearSel:"إلغاء التحديد", nSelected:n=>"محدد "+n, delSel:n=>"حذف ("+n+")", confirmDelN:n=>"تحذف "+n+" التزام من الشهر ده؟", deletedN:n=>"اتحذف "+n+" التزام.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
       months_:["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
       cats:{housing:"سكن",loans:"أقساط وقروض",bills:"فواتير ومرافق",family:"أهل وعائلة",education:"تعليم",transport:"مواصلات وسيارة",insurance:"تأمين وصحة",subs:"اشتراكات",other:"أخرى"},
       ecats:{groceries:"بقالة وسوبرماركت",dining:"مطاعم وكافيهات",fuel:"بنزين ومواصلات",shopping:"تسوق وملابس",health:"صحة وصيدلية",fun:"ترفيه وخروجات",kids:"أطفال",home:"البيت",misc:"أخرى"},
@@ -607,7 +697,7 @@ button,a,label{touch-action:manipulation}
       backup:"Backup", expJson:"Download backup (JSON)", expCsv:"Export history as table (CSV)",
       impNote:"Restoring a backup replaces all current data.", impBtn:"Choose backup file",
       cur:"SAR", addSalary:"Add salary", curMonth:"This month", pastMonth:"Past month", nextMonth:"Upcoming month",
-      prevAria:"Previous month", nextAria:"Next month", settingsAria:"Settings", langAria:"التبديل للعربية", themeAria:"Toggle dark and light mode",
+      prevAria:"Previous month", nextAria:"Next month", settingsAria:"Settings", langAria:"Change language", themeAria:"Toggle dark and light mode",
       markPaid:"Mark as paid", unmarkPaid:"Mark as unpaid",
       left:(u,n)=>u+" of "+n+" left", allPaid:"All paid ✓", lateBy:d=>d+(d===1?" day":" days")+" late", dueToday:"Due today", inDays:d=>"In "+d+(d===1?" day":" days"),
       day:d=>"Day "+d, monthly:"monthly", all:"All", salaryOf:m=>m+" salary", salaryField:"Salary for the month (SAR)", budgetField:"Monthly budget (SAR)",
@@ -631,16 +721,77 @@ button,a,label{touch-action:manipulation}
       errCreds:"Wrong username or password.", errTaken:"That username is taken — pick another.", errConfirm:"Account created but needs confirmation. Turn off “Confirm email” in your Supabase settings.",
       errNet:"Can't reach the server. Check your connection and try again.", errGeneric:"Something went wrong, try again.", wait:"One moment…",
       signedInAs:"Signed in as", newPass:"New password", chgPass:"Change password", passChanged:"Password changed.", logout:"Sign out",
+      account:"Account", curPass:"Current password", newPass2:"Confirm new password", errCurPass:"Current password is wrong.", passSame:"The new password must differ from the current one.",
+      delAccT:"Delete account", delAccNote:"Permanently deletes your account and all its data. This can't be undone.", delAccBtn:"Delete my account", delAccPass:"Enter your password to confirm", delAccYes:"Delete permanently", accDeleted:"Your account was deleted.",
+      security:"Security", bioToggle:"Unlock with Face ID / fingerprint", bioNote:"Asks for your face or fingerprint each time you open the app on this device.", bioOn:"Biometric unlock is on.", bioOff:"Biometric unlock is off.", bioFail:"Couldn't verify. Try again.", bioUnsupported:"This device or browser doesn't support biometric unlock.",
+      lockTitle:"Masarifi is locked", lockSub:"Use Face ID or your fingerprint to continue", unlock:"Unlock", lockSignOut:"Sign out instead",
+      notifs:"Reminders", notifToggle:"Remind me 3 days before due dates", notifNote:"Get a notification 3 days before each unpaid obligation is due.", notifInstall:"On iPhone, add Masarifi to your Home Screen first, then turn reminders on from the installed app.", notifDenied:"Notifications are blocked. Allow them for Masarifi in your phone settings.", notifOn:"Reminders are on.", notifOff:"Reminders are off.", notifTest:"Send a test notification", notifSent:"Test notification sent.", notifUnsupported:"This browser doesn't support notifications.", notifNeedAcct:"Reminders need an account. Use the installed app and sign in.", notifFail:"Couldn't turn on reminders right now. Try again.",
+      select:"Select", selectAll:"Select all", clearSel:"Clear selection", nSelected:n=>n+" selected", delSel:n=>"Delete ("+n+")", confirmDelN:n=>"Delete "+n+(n===1?" obligation":" obligations")+" from this month?", deletedN:n=>n+(n===1?" obligation":" obligations")+" deleted.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
       months_:["January","February","March","April","May","June","July","August","September","October","November","December"],
       cats:{housing:"Housing",loans:"Loans & installments",bills:"Bills & utilities",family:"Family",education:"Education",transport:"Transport & car",insurance:"Insurance & health",subs:"Subscriptions",other:"Other"},
       ecats:{groceries:"Groceries",dining:"Dining & cafés",fuel:"Fuel & rides",shopping:"Shopping & clothes",health:"Health & pharmacy",fun:"Entertainment & outings",kids:"Kids",home:"Home",misc:"Other"},
       exItems:["Apartment rent","Car installment","Electricity bill","Internet & mobile","School fees","Transfer to family","Gym membership"],
       exExp:["Supermarket","Coffee","Fuel","Lunch out","Pharmacy","Cinema"]
+    },
+    de:{
+      title:"Masarifi", appName:"Masarifi", tagline:"Fixkosten und tägliche Ausgaben an einem Ort", tabMonth:"Monat", tabAna:"Analyse", tabHist:"Verlauf",
+      disclaimer:"Diese Analyse ist eine Orientierung auf Basis gängiger Kennzahlen der privaten Finanzplanung, keine Finanzberatung.",
+      leftSalary:"Rest vom Gehalt", salary:"Gehalt", edit:"Bearbeiten", paid:"Bezahlte Fixkosten", due:"Offene Fixkosten", daily:"Tägliche Ausgaben", free:"Rest nach allem",
+      byCat:"Nach Kategorie", paidOfTotal:"Bezahlt / gesamt", obligations:"Fixkosten", dailyTab:"Tägliche Ausgaben", total:"Gesamt",
+      kAvg:"Ø Fixkosten / Monat", kExp:"Ø tägliche Ausgaben / Monat", kFree:"Ø Überschuss / Monat", kCount:"Erfasste Monate",
+      trendTitle:"Gehalt vs. Ausgaben", last12:"Letzte 12 Monate", hCatTitle:"Fixkosten im Verlauf", hExpTitle:"Tägliche Ausgaben im Verlauf", months:"Monate",
+      newOb:"Neue Fixkosten", editOb:"Fixkosten bearbeiten", newExp:"Ausgabe", newExpT:"Neue Ausgabe", editExp:"Ausgabe bearbeiten",
+      fName:"Name", fNamePh:"z. B. Wohnungsmiete", fCat:"Kategorie", fAmt:"Betrag (SAR)", fDay:"Fälligkeitstag", fRec:"Jeden Monat wiederholen",
+      eAmt:"Betrag (SAR)", eNote:"Notiz (optional)", eNotePh:"z. B. Mittagessen im Büro", eDate:"Datum",
+      save:"Speichern", cancel:"Abbrechen", delete:"Löschen", close:"Schließen",
+      spentMonth:"Diesen Monat ausgegeben", perDay:"Pro Tag", budgetT:"Budget für tägliche Ausgaben", setBudget:"Monatsbudget für tägliche Ausgaben festlegen", editBudget:"Bearbeiten",
+      budgetOf:(s,b)=>s+" von "+b, budgetLeft:v=>v+" übrig", budgetOver:v=>v+" darüber", projected:v=>"In diesem Tempo erreichst du "+v+" bis Monatsende",
+      expEmpty:"Diesen Monat noch keine täglichen Ausgaben erfasst. Erfasse alles, auch kleine Beträge, damit die Analyse stimmt.",
+      settings:"Einstellungen", language:"Sprache", appearance:"Darstellung", light:"Hell", dark:"Dunkel", system:"Automatisch",
+      backup:"Sicherung", expJson:"Sicherung herunterladen (JSON)", expCsv:"Verlauf als Tabelle exportieren (CSV)",
+      impNote:"Beim Wiederherstellen werden alle aktuellen Daten ersetzt.", impBtn:"Sicherungsdatei auswählen",
+      cur:"SAR", addSalary:"Gehalt eintragen", curMonth:"Aktueller Monat", pastMonth:"Vergangener Monat", nextMonth:"Kommender Monat",
+      prevAria:"Vorheriger Monat", nextAria:"Nächster Monat", settingsAria:"Einstellungen", langAria:"Sprache wechseln", themeAria:"Hell- und Dunkelmodus umschalten",
+      markPaid:"Als bezahlt markieren", unmarkPaid:"Als unbezahlt markieren",
+      left:(u,n)=>u+" von "+n+" offen", allPaid:"Alles bezahlt ✓", lateBy:d=>d+(d===1?" Tag":" Tage")+" überfällig", dueToday:"Heute fällig", inDays:d=>"In "+d+(d===1?" Tag":" Tagen"),
+      day:d=>"Tag "+d, monthly:"monatlich", all:"Alle", salaryOf:m=>"Gehalt "+m, salaryField:"Gehalt für den Monat (SAR)", budgetField:"Monatsbudget (SAR)",
+      loading:"Deine Daten werden geladen…", emptyMonth:"Für diesen Monat gibt es noch keine Fixkosten.",
+      recFrom:(n,m,a)=>"Du hast "+n+" wiederkehrende Fixkosten aus "+m+" über insgesamt "+a+" SAR.", moveThem:"Übernehmen",
+      startHint:"Trag zuerst dein Gehalt ein, dann jede Fixkostenposition mit Betrag, Kategorie und Fälligkeitstag.", tryExample:"Mit Beispieldaten testen",
+      exampleNote:"Beispieldaten dienen nur zum Ausprobieren – du kannst sie jederzeit ändern oder löschen.", ex:"(Beispiel)",
+      histEmpty:"Noch keine Monate erfasst. Jeder Monat mit Gehalt, Fixkosten oder Ausgaben erscheint hier.", current:" · aktuell",
+      paidPct:(p,n)=>p+" % bezahlt · "+n+(n===1?" Posten":" Posten"), noItems:"Keine Fixkosten", surplus:"Überschuss",
+      errName:"Gib einen Namen ein.", errAmt:"Gib einen Betrag über null ein.", errDay:"Der Fälligkeitstag muss zwischen 1 und 31 liegen.", errDate:"Wähle ein Datum.",
+      confirmDel:"Wirklich löschen?", yesDel:"Ja, löschen",
+      cloudNote:"Deine Daten sind in deinem Konto gespeichert und auf jedem Gerät verfügbar, auf dem du dich anmeldest.",
+      localNote:"Deine Daten sind nur auf diesem Gerät gespeichert. Lade ab und zu eine Sicherung herunter, damit nichts verloren geht.",
+      saved:f=>"Gespeichert: "+f, dlFail:"Die Datei konnte hier nicht heruntergeladen werden.", badFile:"Diese Datei ist keine gültige Sicherung dieser App.",
+      impAsk:n=>"Die Datei enthält "+n+(n===1?" Monat":" Monate")+". Beim Wiederherstellen werden deine aktuellen Daten ersetzt.", restore:"Wiederherstellen", restored:n=>n+(n===1?" Monat":" Monate")+" wiederhergestellt.",
+      stSaving:"Wird gespeichert…", stSaved:"In deinem Konto gespeichert", stLocal:"Daten auf diesem Gerät gespeichert", stLoading:"Wird geladen…",
+      stFail:"Speichern im Konto fehlgeschlagen – bleibt auf diesem Gerät, bis du wieder online bist", stUnreach:"Gespeicherte Daten sind gerade nicht erreichbar",
+      login:"Anmelden", register:"Neues Konto", username:"Benutzername", password:"Passwort", password2:"Passwort bestätigen", show:"Anzeigen", hide:"Verbergen",
+      doLogin:"Anmelden", doRegister:"Konto erstellen", userHint:"Benutzername: lateinische Buchstaben, Ziffern, _ oder . (3–20)",
+      errUser:"Der Benutzername muss 3–20 lateinische Buchstaben, Ziffern, _ oder . enthalten.", errPass:"Das Passwort muss mindestens 6 Zeichen haben.", errMatch:"Die Passwörter stimmen nicht überein.",
+      errCreds:"Benutzername oder Passwort ist falsch.", errTaken:"Dieser Benutzername ist vergeben – wähle einen anderen.", errConfirm:"Konto erstellt, muss aber bestätigt werden. Deaktiviere „Confirm email“ in den Supabase-Einstellungen.",
+      errNet:"Server nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.", errGeneric:"Etwas ist schiefgelaufen, versuche es erneut.", wait:"Einen Moment…",
+      signedInAs:"Angemeldet als", newPass:"Neues Passwort", chgPass:"Passwort ändern", passChanged:"Passwort geändert.", logout:"Abmelden",
+      account:"Konto", curPass:"Aktuelles Passwort", newPass2:"Neues Passwort bestätigen", errCurPass:"Das aktuelle Passwort ist falsch.", passSame:"Das neue Passwort muss sich vom aktuellen unterscheiden.",
+      delAccT:"Konto löschen", delAccNote:"Löscht dein Konto und alle Daten endgültig. Das lässt sich nicht rückgängig machen.", delAccBtn:"Mein Konto löschen", delAccPass:"Gib zur Bestätigung dein Passwort ein", delAccYes:"Endgültig löschen", accDeleted:"Dein Konto wurde gelöscht.",
+      security:"Sicherheit", bioToggle:"Mit Face ID / Fingerabdruck entsperren", bioNote:"Fragt bei jedem Öffnen der App auf diesem Gerät nach Gesicht oder Fingerabdruck.", bioOn:"Biometrische Entsperrung ist an.", bioOff:"Biometrische Entsperrung ist aus.", bioFail:"Überprüfung fehlgeschlagen. Versuche es erneut.", bioUnsupported:"Dieses Gerät oder dieser Browser unterstützt keine biometrische Entsperrung.",
+      lockTitle:"Masarifi ist gesperrt", lockSub:"Mit Face ID oder Fingerabdruck fortfahren", unlock:"Entsperren", lockSignOut:"Stattdessen abmelden",
+      notifs:"Erinnerungen", notifToggle:"3 Tage vor Fälligkeit erinnern", notifNote:"Du bekommst 3 Tage vor jeder unbezahlten Fälligkeit eine Benachrichtigung.", notifInstall:"Auf dem iPhone zuerst Masarifi zum Home-Bildschirm hinzufügen und die Erinnerungen dann in der installierten App einschalten.", notifDenied:"Benachrichtigungen sind blockiert. Erlaube sie für Masarifi in den Telefoneinstellungen.", notifOn:"Erinnerungen sind an.", notifOff:"Erinnerungen sind aus.", notifTest:"Testbenachrichtigung senden", notifSent:"Testbenachrichtigung gesendet.", notifUnsupported:"Dieser Browser unterstützt keine Benachrichtigungen.", notifNeedAcct:"Erinnerungen brauchen ein Konto. Nutze die installierte App und melde dich an.", notifFail:"Erinnerungen konnten gerade nicht eingeschaltet werden. Versuche es erneut.",
+      select:"Auswählen", selectAll:"Alle auswählen", clearSel:"Auswahl aufheben", nSelected:n=>n+" ausgewählt", delSel:n=>"Löschen ("+n+")", confirmDelN:n=>n+(n===1?" Posten":" Posten")+" aus diesem Monat löschen?", deletedN:n=>n+(n===1?" Posten":" Posten")+" gelöscht.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
+      months_:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+      cats:{housing:"Wohnen",loans:"Kredite & Raten",bills:"Rechnungen & Nebenkosten",family:"Familie",education:"Bildung",transport:"Auto & Mobilität",insurance:"Versicherung & Gesundheit",subs:"Abos",other:"Sonstiges"},
+      ecats:{groceries:"Lebensmittel",dining:"Restaurants & Cafés",fuel:"Tanken & Fahrten",shopping:"Shopping & Kleidung",health:"Gesundheit & Apotheke",fun:"Freizeit & Ausgehen",kids:"Kinder",home:"Haushalt",misc:"Sonstiges"},
+      exItems:["Wohnungsmiete","Autorate","Stromrechnung","Internet & Handy","Schulgebühren","Überweisung an Familie","Fitnessstudio"],
+      exExp:["Supermarkt","Kaffee","Tanken","Mittagessen","Apotheke","Kino"]
     }
   };
   const pref=(k,d)=>{ try{ return localStorage.getItem(k)||d; }catch(e){ return d; } };
   const setPref=(k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
   let lang=pref("iltizamat_lang","ar"); if(!I[lang]) lang="ar";
+  const LANGS=["ar","en","de"], LCODE={ar:"ع",en:"EN",de:"DE"};
   let theme=pref("iltizamat_theme","system");
   const T=k=>I[lang][k];
   const MONTHS=()=>T("months_");
@@ -668,6 +819,7 @@ button,a,label{touch-action:manipulation}
 
   /* ================= state ================= */
   let state={v:3,months:{}};
+  let selecting=false, visibleIds=[]; const sel=new Set();
   let ready=false, editing=null, editingExp=null, filter="all", efilter="all", view="month", sub="obl", mode="local", statusKey="";
   function normalize(s){
     const out={v:3,months:{}};
@@ -715,7 +867,7 @@ button,a,label{touch-action:manipulation}
   async function startSupabase(){
     sb=window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth:{persistSession:true,autoRefreshToken:true,storageKey:"masarifi-auth"}});
     const {data}=await sb.auth.getSession();
-    if(data&&data.session) await enterUser(data.session.user); else showAuth();
+    if(data&&data.session){ await enterUser(data.session.user); maybeLock(); } else showAuth();
   }
   async function enterUser(user){
     sbUser=user; mode="cloud";
@@ -763,7 +915,7 @@ button,a,label{touch-action:manipulation}
   function startLocal(){
     mode="local"; cacheKey="masarifi_local";
     state=readCache()||(cacheKey="iltizamat_v1",readCache())||{v:3,months:{}}; cacheKey="masarifi_local";
-    showApp(); setStatus("stLocal"); ready=true; render();
+    showApp(); setStatus("stLocal"); ready=true; render(); maybeLock();
   }
 
   /* ================= auth UI ================= */
@@ -829,7 +981,7 @@ button,a,label{touch-action:manipulation}
     ROOT.lang=lang; ROOT.dir=lang==="ar"?"rtl":"ltr"; document.title=T("title");
     document.querySelectorAll("[data-i]").forEach(el=>{ const v=T(el.dataset.i); if(typeof v==="string") el.textContent=v; });
     $("fName").placeholder=T("fNamePh"); $("eNote").placeholder=T("eNotePh");
-    $("langBtn").textContent=lang==="ar"?"EN":"ع"; $("authLang").textContent=lang==="ar"?"English":"العربية";
+    $("langBtn").textContent=LCODE[lang]; $("authLang").textContent=LANGS.map(l=>T("langNames")[l]).join(" · ");
     $("langBtn").setAttribute("aria-label",T("langAria")); $("themeBtn").setAttribute("aria-label",T("themeAria")); $("setBtn").setAttribute("aria-label",T("settingsAria"));
     const pv=lang==="ar"?"›":"‹", nx=lang==="ar"?"‹":"›";
     ["prevM","aPrev"].forEach(i=>{ $(i).textContent=pv; $(i).setAttribute("aria-label",T("prevAria")); });
@@ -839,7 +991,7 @@ button,a,label{touch-action:manipulation}
     if(statusKey) setStatus(statusKey);
     if(!$("setSheet").hidden) fillSettings();
   }
-  function setLang(l){ lang=l; setPref("iltizamat_lang",l); applyLang(); if(!$("app").hidden) render(); }
+  function setLang(l){ lang=l; setPref("iltizamat_lang",l); applyLang(); if(!$("app").hidden) render(); pushSyncLang(); }
 
   /* ================= derived ================= */
   function totals(mo){
@@ -865,7 +1017,9 @@ button,a,label{touch-action:manipulation}
   function render(){
     if($("app").hidden) return;
     $("viewMonth").hidden=view!=="month"; $("viewAna").hidden=view!=="ana"; $("viewHist").hidden=view!=="hist";
-    $("addBtn").hidden=view!=="month";
+    if(view!=="month"||sub!=="obl") selecting=false;
+    $("addBtn").hidden=view!=="month"||selecting;
+    $("selBar").hidden=!selecting;
     $("fabLabel").textContent=sub==="exp"?T("newExp"):T("newOb");
     $("tabMonth").setAttribute("aria-selected",view==="month"); $("tabAna").setAttribute("aria-selected",view==="ana"); $("tabHist").setAttribute("aria-selected",view==="hist");
     if(view==="hist") renderHist(); else if(view==="ana") renderAnalysis(); else renderMonth();
@@ -909,7 +1063,11 @@ button,a,label{touch-action:manipulation}
     const items=[...mo.items].filter(i=>filter==="all"||catOf(i.cat).k===filter).sort((a,b)=>(a.paid-b.paid)||(a.day-b.day));
     const unpaid=mo.items.filter(i=>!i.paid).length;
     $("countV").textContent=mo.items.length?(unpaid?T("left")(unpaid,mo.items.length):T("allPaid")):"";
-    const ul=$("list"); ul.innerHTML="";
+    const ul=$("list"); ul.innerHTML=""; ul.classList.toggle("selecting",selecting);
+    visibleIds=items.map(i=>i.id);
+    for(const id of [...sel]) if(!mo.items.some(i=>i.id===id)) sel.delete(id);
+    $("selBtn").hidden=!mo.items.length; $("selBtn").textContent=selecting?T("cancel"):T("select");
+    renderSel();
     for(const it of items){
       const {day,diff}=dueInfo(it,y,m); const c=catOf(it.cat);
       const li=document.createElement("li"); li.className="item"+(it.paid?" is-paid":""); li.style.setProperty("--cat",c.c);
@@ -918,11 +1076,14 @@ button,a,label{touch-action:manipulation}
       else if(diff<0) chip='<span class="chip late">'+T("lateBy")(-diff)+'</span>';
       else if(diff===0) chip='<span class="chip late">'+T("dueToday")+'</span>';
       else if(diff<=3) chip='<span class="chip soon">'+T("inDays")(diff)+'</span>';
-      li.innerHTML='<button class="check" type="button" aria-label="'+(it.paid?T("unmarkPaid"):T("markPaid"))+'"><svg viewBox="0 0 16 16" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg></button>'+
+      if(sel.has(it.id)) li.classList.add("is-sel");
+      li.innerHTML='<button class="selbox" type="button" aria-pressed="'+sel.has(it.id)+'" aria-label="'+esc(it.name)+'"><svg viewBox="0 0 16 16" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg></button>'+'<button class="check" type="button" aria-label="'+(it.paid?T("unmarkPaid"):T("markPaid"))+'"><svg viewBox="0 0 16 16" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg></button>'+
         '<button class="body" type="button"><span class="name">'+esc(it.name)+'</span><span class="meta"><span>'+esc(catName(it.cat))+'</span><span class="num">· '+T("day")(day)+'</span>'+(it.recurring?'<span>· '+T("monthly")+'</span>':'')+chip+'</span></button>'+
         '<span class="amt num">'+fmt(+it.amount||0)+'</span>';
       li.querySelector(".check").onclick=()=>{ const x=month(k).items.find(z=>z.id===it.id); x.paid=!x.paid; x.paidAt=x.paid?ymd(new Date()):null; render(); persist(); };
-      li.querySelector(".body").onclick=()=>openItem(it.id);
+      const toggleSel=()=>{ sel.has(it.id)?sel.delete(it.id):sel.add(it.id); renderSel(); li.classList.toggle("is-sel",sel.has(it.id)); li.querySelector(".selbox").setAttribute("aria-pressed",sel.has(it.id)); };
+      li.querySelector(".selbox").onclick=toggleSel;
+      li.querySelector(".body").onclick=()=>selecting?toggleSel():openItem(it.id);
       ul.appendChild(li);
     }
     const box=$("emptyBox"); box.innerHTML="";
@@ -971,7 +1132,7 @@ button,a,label{touch-action:manipulation}
     const ex=mo.expenses.filter(e=>efilter==="all"||ecatOf(e.cat).k===efilter).sort((a,b)=>b.date.localeCompare(a.date));
     if(!ready){ list.innerHTML='<div class="empty"><p>'+T("loading")+'</p></div>'; return; }
     if(!mo.expenses.length){ list.innerHTML='<div class="empty"><p>'+esc(T("expEmpty"))+'</p></div>'; return; }
-    const dfmt=new Intl.DateTimeFormat(lang==="ar"?"ar-EG-u-nu-latn":"en-US",{weekday:"long",day:"numeric",month:"long"});
+    const dfmt=new Intl.DateTimeFormat(lang==="ar"?"ar-EG-u-nu-latn":lang==="de"?"de-DE":"en-US",{weekday:"long",day:"numeric",month:"long"});
     const groups={}; ex.forEach(e=>{ (groups[e.date]=groups[e.date]||[]).push(e); });
     for(const d of Object.keys(groups)){
       const g=document.createElement("div"); g.className="daygrp";
@@ -1091,6 +1252,57 @@ button,a,label{touch-action:manipulation}
       rLate:["Pay right after payday","Pay all obligations within 3 days of salary, or set up auto-debit, to avoid late fees."],
       rSave:a=>["Pay yourself first","Move "+a+" SAR to savings on payday before spending anything; that gets you to 20%."],
       rAuto:a=>["Put the surplus to work","You have "+a+" SAR left. Auto-transfer a fixed part to an emergency fund covering 3–6 months of spending."]
+    },
+    de:{
+      lv:{exc:"Ausgezeichnet",good:"Gut",watch:"Achtung",crit:"Kritisch"}, of100:"von 100",
+      scoreTitle:"Ausgaben-Gesundheit", scoreSub:(r,e,s)=>"Fixkosten machen "+r+" und tägliche Ausgaben "+e+" deines Gehalts aus, übrig bleiben "+s+".",
+      noSalary:"Trag das Gehalt für diesen Monat ein, um die Analyse zu sehen.", noItems:"Für diesen Monat gibt es nichts zu analysieren.", goMonth:"Zum Monat",
+      rObl:"Fixkosten / Gehalt", rExp:"Tägliche Ausgaben", rSav:"Sparquote", rDebt:"Kredite & Raten",
+      tgtMax:v=>"Empfohlen ≤ "+v, tgtMin:v=>"Ziel ≥ "+v, pill:{good:"Gesund",warn:"Achtung",crit:"Risiko",info:"Hinweis"},
+      whereTitle:"Wo das Geld versickert", recTitle:"Spartipps", cmpTitle:"Vergleich mit den Vormonaten",
+      potTitle:"Mögliche Ersparnis pro Monat", potYear:v=>"Etwa "+v+" SAR im Jahr, wenn du die Tipps umsetzt", target:"Ziel",
+      thCat:"Kategorie", thNow:"Dieser Monat", thAvg:"Durchschnitt", thChg:"Änderung", noCmp:"Für den Vergleich braucht es mindestens einen früheren Monat.", vsN:n=>"Durchschnitt der letzten "+n+(n===1?" Monats":" Monate"),
+      grpObl:"Fixkosten", grpExp:"Tägliche Ausgaben", projNote:"(aktueller Monat hochgerechnet nach deinem bisherigen Tempo)",
+      fDeficit:a=>["Ausgaben übersteigen dein Gehalt","Diesen Monat fehlen "+a+" SAR zwischen Fixkosten und täglichen Ausgaben."],
+      fOblHigh:p=>["Fixkosten fressen den Großteil des Gehalts",p+" des Gehalts gehen in Fixkosten; empfohlen sind höchstens 50 %."],
+      fOblOk:p=>["Fixkostenquote ist im Rahmen",p+" des Gehalts, im sicheren Bereich."],
+      fExpHigh:p=>["Tägliche Ausgaben sind hoch",p+" des Gehalts gehen in tägliche Ausgaben; empfohlen sind unter 30 %."],
+      fSavLow:(p,n)=>["Sparquote unter 20 %","Dir bleiben "+p+" des Gehalts. Für 20 % fehlen noch "+n+" SAR."],
+      fSavOk:p=>["Gesunde Sparquote","Dir bleiben "+p+" des Gehalts nach allen Ausgaben."],
+      fHouse:(p,e)=>["Wohnkosten über dem Richtwert","Wohnen macht "+p+" des Gehalts aus, etwa "+e+" SAR über 30 %."],
+      fDebt:p=>["Hohe Kreditraten","Kredite und Raten machen "+p+" des Gehalts aus; empfohlen ist unter einem Drittel."],
+      fSubs:(n,a)=>["Viele Abos",n+" Abos mit zusammen "+a+" SAR im Monat."],
+      fBills:p=>["Hohe Rechnungen","Rechnungen und Nebenkosten machen "+p+" des Gehalts aus."],
+      fTrans:p=>["Hohe Mobilitätskosten","Auto, Tanken und Fahrten machen "+p+" des Gehalts aus."],
+      fOut:(p,a)=>["Viel Essen gehen und Ausgehen","Restaurants, Cafés und Freizeit kosten "+a+" SAR, "+p+" des Gehalts."],
+      fShop:(p,a)=>["Hohe Shopping-Ausgaben","Shopping und Kleidung kosten "+a+" SAR, "+p+" des Gehalts."],
+      fGroc:p=>["Lebensmittel über dem Üblichen","Lebensmittel machen "+p+" des Gehalts aus."],
+      fBudOver:(s,b)=>["Tagesbudget überschritten","Du hast "+s+" bei einem Budget von "+b+" SAR ausgegeben."],
+      fBudProj:(p,b)=>["Budget wird überschritten","In diesem Tempo erreichst du "+p+" SAR bei einem Budget von "+b+"."],
+      fSmall:(n,a)=>["Kleinvieh macht auch Mist",n+" Käufe unter 30 SAR, zusammen "+a+" SAR."],
+      fGrow:(c,p,a)=>[c+" um "+p+" gestiegen",a+" SAR über deinem bisherigen Durchschnitt."],
+      fConc:(c,p)=>[c+" ist der größte Fixposten","Allein "+p+" aller Fixkosten."],
+      fTopExp:(c,p)=>[c+" ist deine größte Alltagskategorie",p+" der täglichen Ausgaben."],
+      fOverdue:(n,a)=>["Überfällige Fixkosten",n+" fällig und unbezahlt, zusammen "+a+" SAR."],
+      fLateHist:(n,p)=>["Häufig zu spät bezahlt",n+" Zahlungen erfolgten nach dem Fälligkeitstag ("+p+" der erfassten Zahlungen)."],
+      fNoExp:["Keine täglichen Ausgaben erfasst","Erfasse deine täglichen Ausgaben, damit die Analyse unbemerkte Kosten aufdeckt."],
+      rDeficit:["Sofort alles Unnötige stoppen","Ordne die Posten nach Wichtigkeit und fang bei Essen gehen, Shopping und Freizeit an, bis die Ausgaben ins Gehalt passen."],
+      rHouse:["Wohnkosten prüfen","Bei der Verlängerung verhandeln oder zum Vertragsende eine kleinere oder nähere Wohnung vergleichen."],
+      rDebt:["Keine neuen Kredite","Sondertilgungen in den teuersten Kredit stecken und bei der Bank nach einer günstigeren Umschuldung fragen."],
+      rSubs:["Abos ausmisten","Kündige, was du letzten Monat nicht genutzt hast, und wechsle beim Rest auf günstigere Jahrespläne."],
+      rBills:["Rechnungen senken","Handy- und Internettarif prüfen und auf Strom- und Klimaanlagenverbrauch achten."],
+      rTrans:["Mobilitätskosten senken","Fahrten bündeln und Versicherungs- sowie Werkstattpreise vergleichen."],
+      rOut:["Essen gehen begrenzen","Lege eine wöchentliche Zahl für Restaurant- und Cafébesuche fest und nimm Essen ins Büro mit."],
+      rShop:["48 Stunden warten vor dem Kauf","Warte bei allem Unnötigen zwei Tage und entferne gespeicherte Karten aus Shopping-Seiten."],
+      rGroc:["Einkäufe planen","Kauf nach einer Wochenliste ein und Grundnahrungsmittel in größeren Mengen."],
+      rBudget:["Beim Tagesbudget bleiben",""],
+      rBudgetD:a=>"Um im Budget zu bleiben, gib für den Rest des Monats höchstens "+a+" SAR pro Tag aus.",
+      rSetBudget:a=>["Tagesbudget festlegen","Starte mit "+a+" SAR im Monat (10 % unter deinem Durchschnitt) und verfolge es im Tab „Tägliche Ausgaben“."],
+      rSmall:["Auf Kleinigkeiten achten","Wiederkehrende Kleinkäufe wie Kaffee und Snacks lassen sich oft unbemerkt halbieren."],
+      rGrow:c=>[c+" wieder normalisieren","Diese Kategorie liegt über deinem Durchschnitt – finde den Grund und setze eine Monatsgrenze."],
+      rLate:["Direkt nach dem Gehalt zahlen","Begleiche alle Fixkosten in den ersten 3 Tagen nach dem Gehalt oder richte Lastschriften ein, um Mahngebühren zu vermeiden."],
+      rSave:a=>["Zahl dich zuerst selbst","Überweise am Zahltag "+a+" SAR aufs Sparkonto, bevor du etwas ausgibst – so erreichst du 20 %."],
+      rAuto:a=>["Überschuss arbeiten lassen","Dir bleiben "+a+" SAR. Überweise automatisch einen festen Teil in einen Notgroschen für 3–6 Monatsausgaben."]
     }
   };
   const AT=k=>A[lang][k];
@@ -1353,21 +1565,13 @@ button,a,label{touch-action:manipulation}
     const ag=$("acctGroup"); ag.hidden=!sbUser;
     $("langGroup").style.borderTop=sbUser?"":"none"; $("langGroup").style.paddingTop=sbUser?"":"0";
     if(sbUser){ const n=usernameOf(sbUser); $("acctName").textContent=n; $("acctAv").textContent=n.slice(0,1).toUpperCase(); }
+    $("passGroup").hidden=!sbUser; $("delGroup").hidden=!sbUser; $("delAccBox").hidden=true;
+    ["passMsg","bioMsg","notifMsg","delMsg"].forEach(i=>$(i).hidden=true);
+    fillSecurity(); fillNotif();
   }
   function openSettings(){ fillSettings(); showSheet($("setSheet")); }
   function showSetMsg(t,bad){ const m=$("setMsg"); m.textContent=t; m.classList.toggle("neg",!!bad); m.hidden=false; }
-  $("chgPass").onclick=async()=>{
-    const p=$("newPass").value; if(p.length<6) return showSetMsg(T("errPass"),true);
-    try{ const {error}=await sb.auth.updateUser({password:p}); if(error) throw error; $("newPass").value=""; showSetMsg(T("passChanged")); }
-    catch(e){ showSetMsg(T(mapErr(e)),true); }
-  };
-  $("logoutBtn").onclick=async()=>{
-    if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; await flush(); }
-    try{ await sb.auth.signOut(); }catch(e){}
-    try{ localStorage.removeItem(cacheKey); }catch(e){}
-    sbUser=null; backend=null; state={v:3,months:{}}; ready=false; setStatus("");
-    closeSheet(); view="month"; sub="obl"; $("aUser").value=""; $("aPass").value=""; showAuth();
-  };
+  $("logoutBtn").onclick=()=>doLogout();
   async function saveFile(filename,text,mime){
     let dl=null; try{ dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null; }catch(e){}
     if(dl){ try{ await dl.save({filename,data:text}); showSetMsg(T("saved")(filename)); }catch(e){ if(e&&e.code!=="declined") showSetMsg(T("dlFail"),true); } return; }
@@ -1401,17 +1605,214 @@ button,a,label{touch-action:manipulation}
   document.querySelectorAll("#segLang button").forEach(b=>b.onclick=()=>setLang(b.dataset.v));
   document.querySelectorAll("#segTheme button").forEach(b=>b.onclick=()=>{ theme=b.dataset.v; setPref("iltizamat_theme",theme); applyTheme(); });
 
+  /* ================= toast ================= */
+  let toastT=null;
+  function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{ t.hidden=true; },2800); }
+  function setMsg(id,text,bad){ const m=$(id); m.textContent=text; m.classList.toggle("neg",!!bad); m.hidden=!text; }
+
+  /* ================= multi-select ================= */
+  function setSelecting(on){ selecting=on; sel.clear(); $("selConfirm").innerHTML=""; render(); }
+  function renderSel(){
+    const n=sel.size, all=visibleIds.length>0&&visibleIds.every(id=>sel.has(id));
+    $("selCount").textContent=T("nSelected")(n);
+    $("selAll").textContent=all?T("clearSel"):T("selectAll");
+    $("selDel").textContent=T("delSel")(n); $("selDel").disabled=!n;
+    if(!n) $("selConfirm").innerHTML="";
+  }
+  $("selBtn").onclick=()=>setSelecting(!selecting);
+  $("selCancel").onclick=()=>setSelecting(false);
+  $("selAll").onclick=()=>{
+    const all=visibleIds.length>0&&visibleIds.every(id=>sel.has(id));
+    if(all) visibleIds.forEach(id=>sel.delete(id)); else visibleIds.forEach(id=>sel.add(id));
+    render();
+  };
+  $("selDel").onclick=()=>{
+    const n=sel.size; if(!n) return;
+    const box=$("selConfirm"); box.innerHTML="";
+    const d=document.createElement("div"); d.className="confirm"; d.innerHTML="<span>"+esc(T("confirmDelN")(n))+"</span>";
+    const yb=document.createElement("button"); yb.type="button"; yb.className="btn danger"; yb.textContent=T("yesDel");
+    yb.onclick=()=>{ const mo=month(keyOf(cur)); mo.items=mo.items.filter(i=>!sel.has(i.id)); persist(); setSelecting(false); toast(T("deletedN")(n)); };
+    d.appendChild(yb); box.appendChild(d);
+  };
+
+  /* ================= account ================= */
+  async function verifyPassword(p){
+    const {error}=await sb.auth.signInWithPassword({email:sbUser.email,password:p});
+    if(error){ const k=mapErr(error); throw (k==="errCreds"?"errCurPass":k); }
+  }
+  $("chgPass").onclick=async()=>{
+    const c=$("curPass").value, p=$("newPass").value, p2=$("newPass2").value;
+    if(!c) return setMsg("passMsg",T("errCurPass"),true);
+    if(p.length<6) return setMsg("passMsg",T("errPass"),true);
+    if(p!==p2) return setMsg("passMsg",T("errMatch"),true);
+    if(p===c) return setMsg("passMsg",T("passSame"),true);
+    const btn=$("chgPass"); btn.disabled=true; btn.textContent=T("wait");
+    try{
+      await verifyPassword(c);
+      const {error}=await sb.auth.updateUser({password:p}); if(error) throw mapErr(error);
+      ["curPass","newPass","newPass2"].forEach(i=>$(i).value="");
+      setMsg("passMsg",T("passChanged"),false);
+    }catch(k){ setMsg("passMsg",T(typeof k==="string"?k:"errGeneric"),true); }
+    finally{ btn.disabled=false; btn.textContent=T("chgPass"); }
+  };
+  $("delAccBtn").onclick=()=>{ $("delAccBox").hidden=false; $("delAccBox").style.display="flex"; $("delPass").value=""; setTimeout(()=>$("delPass").focus(),50); };
+  $("delAccYes").onclick=async()=>{
+    const p=$("delPass").value; if(!p) return setMsg("delMsg",T("errCurPass"),true);
+    const btn=$("delAccYes"); btn.disabled=true; btn.textContent=T("wait");
+    try{
+      await verifyPassword(p);
+      await pushDisable().catch(()=>{});
+      const {error}=await sb.rpc("delete_my_account"); if(error) throw "errGeneric";
+      const uid=sbUser.id;
+      try{ localStorage.removeItem("masarifi_cache_"+uid); localStorage.removeItem(bioKey()); localStorage.removeItem("masarifi_push_"+uid); }catch(e){}
+      await doLogout(true);
+      toast(T("accDeleted"));
+    }catch(k){ setMsg("delMsg",T(typeof k==="string"?k:"errGeneric"),true); }
+    finally{ btn.disabled=false; btn.textContent=T("delAccYes"); }
+  };
+  async function doLogout(deleted){
+    if(!deleted&&saveTimer){ clearTimeout(saveTimer); saveTimer=null; await flush(); }
+    if(!deleted) await pushDisable().catch(()=>{});
+    try{ await sb.auth.signOut({scope:"local"}); }catch(e){}
+    try{ localStorage.removeItem(cacheKey); }catch(e){}
+    sbUser=null; backend=null; state={v:3,months:{}}; ready=false; setStatus("");
+    selecting=false; sel.clear(); $("lockScreen").hidden=true;
+    closeSheet(); view="month"; sub="obl"; $("aUser").value=""; $("aPass").value=""; showAuth();
+  }
+
+  /* ================= biometric unlock ================= */
+  const inClaude=()=>!!(window.claude&&window.claude.use)&&!sb;
+  const bioKey=()=>"masarifi_bio_"+(sbUser?sbUser.id:"local");
+  const b64u=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  const ub64u=s=>Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((s.length+3)%4)),c=>c.charCodeAt(0));
+  let bioAvail=null;
+  async function bioSupported(){
+    if(bioAvail!==null) return bioAvail;
+    try{ bioAvail=!inClaude()&&!!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); }catch(e){ bioAvail=false; }
+    return bioAvail;
+  }
+  const bioEnabled=()=>!!pref(bioKey(),"");
+  async function bioRegister(){
+    const name=sbUser?usernameOf(sbUser):"masarifi";
+    const cred=await navigator.credentials.create({publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)), rp:{name:"Masarifi"},
+      user:{id:crypto.getRandomValues(new Uint8Array(16)),name,displayName:"Masarifi · "+name},
+      pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"discouraged"},
+      timeout:60000, attestation:"none"}});
+    setPref(bioKey(),b64u(cred.rawId));
+  }
+  async function bioVerify(){
+    await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials:[{type:"public-key",id:ub64u(pref(bioKey(),"")),transports:["internal","hybrid"]}],
+      userVerification:"required",timeout:60000}});
+  }
+  async function fillSecurity(){
+    const ok=await bioSupported();
+    $("secGroup").hidden=!ok&&inClaude();
+    $("bioSw").disabled=!ok; $("bioSw").checked=ok&&bioEnabled();
+    if(!ok&&!inClaude()) setMsg("bioMsg",T("bioUnsupported"),false);
+  }
+  $("bioSw").onchange=async e=>{
+    const on=e.target.checked;
+    try{
+      if(on){ await bioRegister(); await bioVerify(); setMsg("bioMsg",T("bioOn"),false); }
+      else { try{ localStorage.removeItem(bioKey()); }catch(_){} setMsg("bioMsg",T("bioOff"),false); }
+    }catch(err){ try{ localStorage.removeItem(bioKey()); }catch(_){} e.target.checked=false; setMsg("bioMsg",T("bioFail"),true); }
+  };
+  async function unlock(){
+    $("lockErr").hidden=true; $("unlockBtn").disabled=true;
+    try{ await bioVerify(); $("lockScreen").hidden=true; }
+    catch(e){ $("lockErr").textContent=T("bioFail"); $("lockErr").hidden=false; }
+    finally{ $("unlockBtn").disabled=false; }
+  }
+  async function maybeLock(){
+    if(!bioEnabled()||!(await bioSupported())) return;
+    $("lockScreen").hidden=false; closeSheet();
+    unlock();
+  }
+  $("unlockBtn").onclick=unlock;
+  $("lockOut").onclick=()=>{ if(sb&&sbUser) doLogout(); else $("lockScreen").hidden=true; };
+  let hiddenAt=0;
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="hidden") hiddenAt=Date.now();
+    else if(hiddenAt&&Date.now()-hiddenAt>60000&&!$("app").hidden&&$("lockScreen").hidden) maybeLock();
+  });
+
+  /* ================= due-date reminders (Web Push) ================= */
+  const pushKey=()=>"masarifi_push_"+(sbUser?sbUser.id:"");
+  const isIOS=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  const standalone=()=>window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  const pushSupported=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+  async function fnCall(method,body,useUser){
+    const headers={apikey:CFG.supabaseAnonKey,"Content-Type":"application/json"};
+    let tok=CFG.supabaseAnonKey;
+    if(useUser){ const {data}=await sb.auth.getSession(); tok=data&&data.session?data.session.access_token:tok; }
+    headers.Authorization="Bearer "+tok;
+    const r=await fetch(CFG.supabaseUrl+"/functions/v1/reminders"+(method==="GET"?"?action=key":""),{method,headers,body:body?JSON.stringify(body):undefined});
+    if(!r.ok) throw new Error("fn "+r.status);
+    return r.json();
+  }
+  async function currentSub(){
+    if(!pushSupported()) return null;
+    const reg=await navigator.serviceWorker.getRegistration(); return reg?await reg.pushManager.getSubscription():null;
+  }
+  async function pushEnable(){
+    if(Notification.permission==="denied") throw "notifDenied";
+    const perm=await Notification.requestPermission(); if(perm!=="granted") throw "notifDenied";
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub){ const {key}=await fnCall("GET"); sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(key)}); }
+    const j=sub.toJSON();
+    const tz=(Intl.DateTimeFormat().resolvedOptions().timeZone)||"Asia/Riyadh";
+    const {error}=await sb.from("push_subscriptions").upsert({endpoint:j.endpoint,user_id:sbUser.id,subscription:j,lang,tz,updated_at:new Date().toISOString()});
+    if(error) throw "notifFail";
+    setPref(pushKey(),"1");
+  }
+  async function pushDisable(){
+    const sub=await currentSub();
+    if(sub){ if(sb&&sbUser) await sb.from("push_subscriptions").delete().eq("endpoint",sub.endpoint); await sub.unsubscribe(); }
+    try{ localStorage.removeItem(pushKey()); }catch(e){}
+  }
+  async function pushSyncLang(){
+    try{ if(!sb||!sbUser||!pref(pushKey(),"")) return; const sub=await currentSub(); if(sub) await sb.from("push_subscriptions").update({lang}).eq("endpoint",sub.endpoint); }catch(e){}
+  }
+  async function fillNotif(){
+    const g=$("notifGroup");
+    if(!sbUser){ g.hidden=inClaude(); $("notifSw").disabled=true; $("notifSw").checked=false; $("notifTest").hidden=true; if(!inClaude()) setMsg("notifMsg",T("notifNeedAcct"),false); return; }
+    g.hidden=false;
+    if(!pushSupported()){ $("notifSw").disabled=true; $("notifSw").checked=false; $("notifTest").hidden=true; setMsg("notifMsg",T(isIOS()&&!standalone()?"notifInstall":"notifUnsupported"),false); return; }
+    const sub=await currentSub(); const on=!!sub&&Notification.permission==="granted"&&!!pref(pushKey(),"");
+    $("notifSw").disabled=false; $("notifSw").checked=on; $("notifTest").hidden=!on;
+    if(Notification.permission==="denied") setMsg("notifMsg",T("notifDenied"),true);
+  }
+  $("notifSw").onchange=async e=>{
+    const on=e.target.checked; e.target.disabled=true;
+    try{
+      if(on){ await pushEnable(); setMsg("notifMsg",T("notifOn"),false); $("notifTest").hidden=false; }
+      else { await pushDisable(); setMsg("notifMsg",T("notifOff"),false); $("notifTest").hidden=true; }
+    }catch(k){ e.target.checked=false; $("notifTest").hidden=true; setMsg("notifMsg",T(typeof k==="string"?k:"notifFail"),true); }
+    finally{ e.target.disabled=false; }
+  };
+  $("notifTest").onclick=async()=>{
+    const b=$("notifTest"); b.disabled=true;
+    try{ const r=await fnCall("POST",{action:"test"},true); setMsg("notifMsg",r.sent?T("notifSent"):T("notifFail"),!r.sent); }
+    catch(e){ setMsg("notifMsg",T("notifFail"),true); }
+    finally{ b.disabled=false; }
+  };
+
   /* ================= wiring ================= */
   document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeSheet);
   $("scrim").onclick=closeSheet;
   document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&openSheetEl) closeSheet(); });
   $("addBtn").onclick=()=>sub==="exp"?openExp(null):openItem(null);
   $("salaryBtn").onclick=openSalary; $("setBtn").onclick=openSettings;
-  $("langBtn").onclick=()=>setLang(lang==="ar"?"en":"ar"); $("authLang").onclick=()=>setLang(lang==="ar"?"en":"ar");
+  const nextLang=()=>LANGS[(LANGS.indexOf(lang)+1)%LANGS.length];
+  $("langBtn").onclick=()=>setLang(nextLang()); $("authLang").onclick=()=>setLang(nextLang());
   $("themeBtn").onclick=()=>{ theme=isDark()?"light":"dark"; setPref("iltizamat_theme",theme); applyTheme(); };
   $("tabMonth").onclick=()=>{ view="month"; render(); }; $("tabAna").onclick=()=>{ view="ana"; render(); }; $("tabHist").onclick=()=>{ view="hist"; render(); };
   document.querySelectorAll("#subSeg button").forEach(b=>b.onclick=()=>{ sub=b.dataset.v; render(); });
-  const shift=d=>{ cur=new Date(cur.getFullYear(),cur.getMonth()+d,1); filter="all"; efilter="all"; render(); };
+  const shift=d=>{ cur=new Date(cur.getFullYear(),cur.getMonth()+d,1); filter="all"; efilter="all"; selecting=false; sel.clear(); render(); };
   $("prevM").onclick=()=>shift(-1); $("nextM").onclick=()=>shift(1); $("aPrev").onclick=()=>shift(-1); $("aNext").onclick=()=>shift(1);
 
   /* ================= boot ================= */
