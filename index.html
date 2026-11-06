@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>مصاريفي</title>
 <meta name="theme-color" content="#e8f2ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -300,6 +300,13 @@ html[dir="rtl"] .item::before{border-radius:4px 0 0 4px}
 .cmp tr.grp td{color:var(--muted);font-size:.75rem;padding-top:12px;border-top:none}
 </style>
 
+<style>
+/* no auto-zoom: iOS zooms when a focused field's text is under 16px */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
+html,body{overflow-x:hidden;max-width:100%}
+input,select,textarea,.field input[type=text],.field input[type=number],.field input[type=password],.field input[type=date]{font-size:16px}
+button,a,label{touch-action:manipulation}
+</style>
 <!-- AUTH -->
 <div class="wrap auth" id="auth" hidden>
   <form class="card" id="authForm" autocomplete="on">
