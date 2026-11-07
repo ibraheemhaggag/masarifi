@@ -49,29 +49,34 @@ type Lang = "ar" | "en" | "de";
 const fmt = (n: number) => (Math.round(n * 100) / 100).toLocaleString("en-US", { maximumFractionDigits: 2 });
 const MSG: Record<Lang, {
   title: string; locale: string;
-  one: (name: string, amt: string, date: string) => string;
-  many: (count: number, amt: string, date: string, names: string) => string;
+  one: (name: string, amt: string, date: string, cur: string) => string;
+  many: (count: number, amt: string, date: string, names: string, cur: string) => string;
   test: string;
 }> = {
   ar: {
     title: "Masarifi · تذكير بالاستحقاق", locale: "ar-EG-u-nu-latn",
-    one: (n, a, d) => `«${n}» مستحق بعد ٣ أيام (${d}) — ${a} ر.س`,
-    many: (c, a, d, ns) => `عندك ${c} التزامات مستحقة بعد ٣ أيام (${d}) بإجمالي ${a} ر.س: ${ns}`,
+    one: (n, a, d, c) => `«${n}» مستحق بعد ٣ أيام (${d}) — ${a} ${c}`,
+    many: (c, a, d, ns, k) => `عندك ${c} التزامات مستحقة بعد ٣ أيام (${d}) بإجمالي ${a} ${k}: ${ns}`,
     test: "التنبيهات شغّالة ✓ هيوصلك تذكير قبل ميعاد كل التزام بـ ٣ أيام.",
   },
   en: {
     title: "Masarifi · Payment reminder", locale: "en-US",
-    one: (n, a, d) => `“${n}” is due in 3 days (${d}) — ${a} SAR`,
-    many: (c, a, d, ns) => `${c} obligations are due in 3 days (${d}), totaling ${a} SAR: ${ns}`,
+    one: (n, a, d, c) => `“${n}” is due in 3 days (${d}) — ${a} ${c}`,
+    many: (c, a, d, ns, k) => `${c} obligations are due in 3 days (${d}), totaling ${a} ${k}: ${ns}`,
     test: "Reminders are on ✓ You'll be notified 3 days before each due date.",
   },
   de: {
     title: "Masarifi · Zahlungserinnerung", locale: "de-DE",
-    one: (n, a, d) => `„${n}“ ist in 3 Tagen fällig (${d}) – ${a} SAR`,
-    many: (c, a, d, ns) => `${c} Posten sind in 3 Tagen fällig (${d}), zusammen ${a} SAR: ${ns}`,
+    one: (n, a, d, c) => `„${n}“ ist in 3 Tagen fällig (${d}) – ${a} ${c}`,
+    many: (c, a, d, ns, k) => `${c} Posten sind in 3 Tagen fällig (${d}), zusammen ${a} ${k}: ${ns}`,
     test: "Erinnerungen sind an ✓ Du wirst 3 Tage vor jeder Fälligkeit benachrichtigt.",
   },
 };
+const CUR: Record<string, Record<Lang, string>> = {
+  SAR: { ar: "ر.س", en: "SAR", de: "SAR" }, EUR: { ar: "€", en: "€", de: "€" },
+  USD: { ar: "$", en: "$", de: "$" }, EGP: { ar: "ج.م", en: "EGP", de: "EGP" },
+};
+const curOf = (c: unknown, lg: Lang) => (CUR[String(c)] ?? CUR.SAR)[lg];
 const langOf = (l: string | null): Lang => (l === "en" || l === "de" ? l : "ar");
 
 function localYmd(tz: string, addDays = 0) {
@@ -144,8 +149,8 @@ async function runDaily() {
       const M = MSG[lg];
       const dateTxt = new Intl.DateTimeFormat(M.locale, { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(target + "T00:00:00Z"));
       const body = items.length === 1
-        ? M.one(items[0].name, fmt(Number(items[0].amount) || 0), dateTxt)
-        : M.many(items.length, fmt(total), dateTxt, items.map((i) => i.name).join(lg === "ar" ? "، " : ", "));
+        ? M.one(items[0].name, fmt(Number(items[0].amount) || 0), dateTxt, curOf(led?.data?.currency, lg))
+        : M.many(items.length, fmt(total), dateTxt, items.map((i) => i.name).join(lg === "ar" ? "، " : ", "), curOf(led?.data?.currency, lg));
       notified += await send(devs, { title: M.title, body, tag: "due-" + target, url: "./", lang: lg, dir: lg === "ar" ? "rtl" : "ltr" });
     }
   }
