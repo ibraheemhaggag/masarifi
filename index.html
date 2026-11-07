@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ 'sha256-9HXO0M+GULA5wMC17g+x31zGrwyrYLZd0bcdHkSq8CI=' 'sha256-Rf7k0guCxR74lN1MFxpJ2WsBu/wE8poHGuSFG95JBpo=' 'sha256-ADi4E6eCQX7KvNgc8ravF0AVeJ9bnwktz4IrWyB2U8Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://qbiqyhpvooldrjuqwihz.supabase.co wss://qbiqyhpvooldrjuqwihz.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/ 'sha256-9HXO0M+GULA5wMC17g+x31zGrwyrYLZd0bcdHkSq8CI=' 'sha256-snu0M+uPrlenX4kNYlg5697G7pbcolUhjMwd7kRMRIs=' 'sha256-ADi4E6eCQX7KvNgc8ravF0AVeJ9bnwktz4IrWyB2U8Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://qbiqyhpvooldrjuqwihz.supabase.co wss://qbiqyhpvooldrjuqwihz.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <script>if(window.top!==window.self){document.documentElement.style.display="none";try{window.top.location.replace(window.self.location.href)}catch(e){}}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
@@ -321,6 +321,12 @@ button,a,label{touch-action:manipulation}
 .list.selecting .item .selbox{display:grid}
 .list.selecting .item .check{display:none}
 .list.selecting .item{cursor:pointer}
+.exprow .esel{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:none;place-items:center}
+.exprow .esel svg{width:14px;height:14px;opacity:0}
+#expList.selecting .exprow .esel{display:grid}
+.exprow.is-sel{box-shadow:0 0 0 2px var(--accent),var(--glass-shadow)}
+.exprow.is-sel .esel{background:var(--accent);border-color:var(--accent)}
+.exprow.is-sel .esel svg{opacity:1}
 .item.is-sel{box-shadow:0 0 0 2px var(--accent),var(--glass-shadow)}
 .item.is-sel .selbox{background:var(--accent);border-color:var(--accent)}
 .item.is-sel .selbox svg{opacity:1}
@@ -445,6 +451,7 @@ button,a,label{touch-action:manipulation}
         <div class="catrows" id="expCatRows"></div>
       </section>
       <div class="filters" id="expFilters" role="group"></div>
+      <div class="list-head" id="expHead"><h2 data-i="daily"></h2><span class="lh-r"><span id="expCount"></span><button class="selbtn" id="selBtnE" type="button" hidden></button></span></div>
       <div id="expList" class="wrap" style="gap:14px"></div>
     </div>
   </div>
@@ -590,6 +597,10 @@ button,a,label{touch-action:manipulation}
       <span class="label" data-i="language"></span>
       <div class="seg" id="segLang"><button type="button" data-v="ar">العربية</button><button type="button" data-v="en">English</button><button type="button" data-v="de">Deutsch</button></div>
     </div>
+    <div class="setgroup" id="curGroup">
+      <span class="label" data-i="currency"></span>
+      <div class="seg" id="segCur"><button type="button" data-v="SAR"></button><button type="button" data-v="EUR"></button><button type="button" data-v="USD"></button><button type="button" data-v="EGP"></button></div>
+    </div>
     <div class="setgroup">
       <span class="label" data-i="appearance"></span>
       <div class="seg" id="segTheme"><button type="button" data-v="light" data-i="light"></button><button type="button" data-v="dark" data-i="dark"></button><button type="button" data-v="system" data-i="system"></button></div>
@@ -642,7 +653,7 @@ button,a,label{touch-action:manipulation}
       spentMonth:"صرفت الشهر ده", perDay:"في اليوم", budgetT:"ميزانية المصاريف اليومية", setBudget:"حدد ميزانية شهرية للمصاريف اليومية", editBudget:"تعديل",
       budgetOf:(s,b)=>s+" من "+b, budgetLeft:v=>"باقي "+v, budgetOver:v=>"زيادة "+v, projected:v=>"لو كملت كده هتوصل "+v+" آخر الشهر",
       expEmpty:"لسه مسجلتش مصاريف يومية الشهر ده. سجّل أي حاجة بتصرفها، ولو صغيرة، عشان التحليل يبقى دقيق.",
-      settings:"الإعدادات", language:"اللغة", appearance:"المظهر", light:"نهاري", dark:"ليلي", system:"تلقائي",
+      settings:"الإعدادات", language:"اللغة", currency:"العملة", appearance:"المظهر", light:"نهاري", dark:"ليلي", system:"تلقائي",
       backup:"النسخ الاحتياطي", expJson:"تنزيل نسخة احتياطية (JSON)", expCsv:"تصدير السجل كجدول (CSV)",
       impNote:"استرجاع نسخة احتياطية هيستبدل البيانات الحالية بالكامل.", impBtn:"اختار ملف النسخة الاحتياطية",
       cur:"ر.س", addSalary:"أضف الراتب", curMonth:"الشهر الحالي", pastMonth:"شهر سابق", nextMonth:"شهر قادم",
@@ -675,7 +686,7 @@ button,a,label{touch-action:manipulation}
       security:"الأمان", bioToggle:"فتح التطبيق بالبصمة / Face ID", bioNote:"هيطلب بصمتك أو وشّك كل ما تفتح التطبيق على الجهاز ده.", bioOn:"فتح التطبيق بالبصمة شغّال.", bioOff:"فتح التطبيق بالبصمة متوقف.", bioFail:"ماقدرناش نتحقق، جرّب تاني.", bioUnsupported:"الجهاز أو المتصفح ده مش بيدعم الفتح بالبصمة.",
       lockTitle:"التطبيق مقفول", lockSub:"استخدم البصمة أو Face ID عشان تكمّل", unlock:"افتح", lockSignOut:"تسجيل خروج بدل كده",
       notifs:"التنبيهات", notifToggle:"تنبيه قبل الاستحقاق بـ ٣ أيام", notifNote:"هيوصلك إشعار قبل ميعاد كل التزام مش متسدد بـ ٣ أيام.", notifInstall:"على الآيفون: ضيف التطبيق للشاشة الرئيسية الأول، وبعدين شغّل التنبيهات من التطبيق المثبت.", notifDenied:"الإشعارات مقفولة. اسمح بيها لـ Masarifi من إعدادات الموبايل.", notifOn:"التنبيهات شغّالة.", notifOff:"التنبيهات متوقفة.", notifTest:"ابعت إشعار تجربة", notifSent:"اتبعت إشعار التجربة.", notifUnsupported:"المتصفح ده مش بيدعم الإشعارات.", notifNeedAcct:"التنبيهات محتاجة حساب. استخدم التطبيق المثبت بعد تسجيل الدخول.", notifFail:"ماقدرناش نشغّل التنبيهات دلوقتي، جرّب تاني.",
-      select:"تحديد", selectAll:"تحديد الكل", clearSel:"إلغاء التحديد", nSelected:n=>"محدد "+n, delSel:n=>"حذف ("+n+")", confirmDelN:n=>"تحذف "+n+" التزام من الشهر ده؟", deletedN:n=>"اتحذف "+n+" التزام.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
+      select:"تحديد", selectAll:"تحديد الكل", clearSel:"إلغاء التحديد", nSelected:n=>"محدد "+n, delSel:n=>"حذف ("+n+")", confirmDelN:n=>"تحذف "+n+" التزام من الشهر ده؟", deletedN:n=>"اتحذف "+n+" التزام.", confirmDelE:n=>"تحذف "+n+" مصروف من الشهر ده؟", deletedE:n=>"اتحذف "+n+" مصروف.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
       months_:["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
       cats:{housing:"سكن",loans:"أقساط وقروض",bills:"فواتير ومرافق",family:"أهل وعائلة",education:"تعليم",transport:"مواصلات وسيارة",insurance:"تأمين وصحة",subs:"اشتراكات",other:"أخرى"},
       ecats:{groceries:"بقالة وسوبرماركت",dining:"مطاعم وكافيهات",fuel:"بنزين ومواصلات",shopping:"تسوق وملابس",health:"صحة وصيدلية",fun:"ترفيه وخروجات",kids:"أطفال",home:"البيت",misc:"أخرى"},
@@ -696,7 +707,7 @@ button,a,label{touch-action:manipulation}
       spentMonth:"Spent this month", perDay:"Per day", budgetT:"Daily spending budget", setBudget:"Set a monthly budget for daily spending", editBudget:"Edit",
       budgetOf:(s,b)=>s+" of "+b, budgetLeft:v=>v+" left", budgetOver:v=>v+" over", projected:v=>"At this pace you'll reach "+v+" by month-end",
       expEmpty:"No daily spending logged this month yet. Log everything you spend, even small amounts, so the analysis stays accurate.",
-      settings:"Settings", language:"Language", appearance:"Appearance", light:"Light", dark:"Dark", system:"Auto",
+      settings:"Settings", language:"Language", currency:"Currency", appearance:"Appearance", light:"Light", dark:"Dark", system:"Auto",
       backup:"Backup", expJson:"Download backup (JSON)", expCsv:"Export history as table (CSV)",
       impNote:"Restoring a backup replaces all current data.", impBtn:"Choose backup file",
       cur:"SAR", addSalary:"Add salary", curMonth:"This month", pastMonth:"Past month", nextMonth:"Upcoming month",
@@ -729,7 +740,7 @@ button,a,label{touch-action:manipulation}
       security:"Security", bioToggle:"Unlock with Face ID / fingerprint", bioNote:"Asks for your face or fingerprint each time you open the app on this device.", bioOn:"Biometric unlock is on.", bioOff:"Biometric unlock is off.", bioFail:"Couldn't verify. Try again.", bioUnsupported:"This device or browser doesn't support biometric unlock.",
       lockTitle:"Masarifi is locked", lockSub:"Use Face ID or your fingerprint to continue", unlock:"Unlock", lockSignOut:"Sign out instead",
       notifs:"Reminders", notifToggle:"Remind me 3 days before due dates", notifNote:"Get a notification 3 days before each unpaid obligation is due.", notifInstall:"On iPhone, add Masarifi to your Home Screen first, then turn reminders on from the installed app.", notifDenied:"Notifications are blocked. Allow them for Masarifi in your phone settings.", notifOn:"Reminders are on.", notifOff:"Reminders are off.", notifTest:"Send a test notification", notifSent:"Test notification sent.", notifUnsupported:"This browser doesn't support notifications.", notifNeedAcct:"Reminders need an account. Use the installed app and sign in.", notifFail:"Couldn't turn on reminders right now. Try again.",
-      select:"Select", selectAll:"Select all", clearSel:"Clear selection", nSelected:n=>n+" selected", delSel:n=>"Delete ("+n+")", confirmDelN:n=>"Delete "+n+(n===1?" obligation":" obligations")+" from this month?", deletedN:n=>n+(n===1?" obligation":" obligations")+" deleted.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
+      select:"Select", selectAll:"Select all", clearSel:"Clear selection", nSelected:n=>n+" selected", delSel:n=>"Delete ("+n+")", confirmDelN:n=>"Delete "+n+(n===1?" obligation":" obligations")+" from this month?", deletedN:n=>n+(n===1?" obligation":" obligations")+" deleted.", confirmDelE:n=>"Delete "+n+(n===1?" expense":" expenses")+" from this month?", deletedE:n=>n+(n===1?" expense":" expenses")+" deleted.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
       months_:["January","February","March","April","May","June","July","August","September","October","November","December"],
       cats:{housing:"Housing",loans:"Loans & installments",bills:"Bills & utilities",family:"Family",education:"Education",transport:"Transport & car",insurance:"Insurance & health",subs:"Subscriptions",other:"Other"},
       ecats:{groceries:"Groceries",dining:"Dining & cafés",fuel:"Fuel & rides",shopping:"Shopping & clothes",health:"Health & pharmacy",fun:"Entertainment & outings",kids:"Kids",home:"Home",misc:"Other"},
@@ -750,7 +761,7 @@ button,a,label{touch-action:manipulation}
       spentMonth:"Diesen Monat ausgegeben", perDay:"Pro Tag", budgetT:"Budget für tägliche Ausgaben", setBudget:"Monatsbudget für tägliche Ausgaben festlegen", editBudget:"Bearbeiten",
       budgetOf:(s,b)=>s+" von "+b, budgetLeft:v=>v+" übrig", budgetOver:v=>v+" darüber", projected:v=>"In diesem Tempo erreichst du "+v+" bis Monatsende",
       expEmpty:"Diesen Monat noch keine täglichen Ausgaben erfasst. Erfasse alles, auch kleine Beträge, damit die Analyse stimmt.",
-      settings:"Einstellungen", language:"Sprache", appearance:"Darstellung", light:"Hell", dark:"Dunkel", system:"Automatisch",
+      settings:"Einstellungen", language:"Sprache", currency:"Währung", appearance:"Darstellung", light:"Hell", dark:"Dunkel", system:"Automatisch",
       backup:"Sicherung", expJson:"Sicherung herunterladen (JSON)", expCsv:"Verlauf als Tabelle exportieren (CSV)",
       impNote:"Beim Wiederherstellen werden alle aktuellen Daten ersetzt.", impBtn:"Sicherungsdatei auswählen",
       cur:"SAR", addSalary:"Gehalt eintragen", curMonth:"Aktueller Monat", pastMonth:"Vergangener Monat", nextMonth:"Kommender Monat",
@@ -783,7 +794,7 @@ button,a,label{touch-action:manipulation}
       security:"Sicherheit", bioToggle:"Mit Face ID / Fingerabdruck entsperren", bioNote:"Fragt bei jedem Öffnen der App auf diesem Gerät nach Gesicht oder Fingerabdruck.", bioOn:"Biometrische Entsperrung ist an.", bioOff:"Biometrische Entsperrung ist aus.", bioFail:"Überprüfung fehlgeschlagen. Versuche es erneut.", bioUnsupported:"Dieses Gerät oder dieser Browser unterstützt keine biometrische Entsperrung.",
       lockTitle:"Masarifi ist gesperrt", lockSub:"Mit Face ID oder Fingerabdruck fortfahren", unlock:"Entsperren", lockSignOut:"Stattdessen abmelden",
       notifs:"Erinnerungen", notifToggle:"3 Tage vor Fälligkeit erinnern", notifNote:"Du bekommst 3 Tage vor jeder unbezahlten Fälligkeit eine Benachrichtigung.", notifInstall:"Auf dem iPhone zuerst Masarifi zum Home-Bildschirm hinzufügen und die Erinnerungen dann in der installierten App einschalten.", notifDenied:"Benachrichtigungen sind blockiert. Erlaube sie für Masarifi in den Telefoneinstellungen.", notifOn:"Erinnerungen sind an.", notifOff:"Erinnerungen sind aus.", notifTest:"Testbenachrichtigung senden", notifSent:"Testbenachrichtigung gesendet.", notifUnsupported:"Dieser Browser unterstützt keine Benachrichtigungen.", notifNeedAcct:"Erinnerungen brauchen ein Konto. Nutze die installierte App und melde dich an.", notifFail:"Erinnerungen konnten gerade nicht eingeschaltet werden. Versuche es erneut.",
-      select:"Auswählen", selectAll:"Alle auswählen", clearSel:"Auswahl aufheben", nSelected:n=>n+" ausgewählt", delSel:n=>"Löschen ("+n+")", confirmDelN:n=>n+(n===1?" Posten":" Posten")+" aus diesem Monat löschen?", deletedN:n=>n+(n===1?" Posten":" Posten")+" gelöscht.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
+      select:"Auswählen", selectAll:"Alle auswählen", clearSel:"Auswahl aufheben", nSelected:n=>n+" ausgewählt", delSel:n=>"Löschen ("+n+")", confirmDelN:n=>n+(n===1?" Posten":" Posten")+" aus diesem Monat löschen?", deletedN:n=>n+(n===1?" Posten":" Posten")+" gelöscht.", confirmDelE:n=>n+(n===1?" Ausgabe":" Ausgaben")+" aus diesem Monat löschen?", deletedE:n=>n+(n===1?" Ausgabe":" Ausgaben")+" gelöscht.", langNames:{ar:"العربية",en:"English",de:"Deutsch"},
       months_:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
       cats:{housing:"Wohnen",loans:"Kredite & Raten",bills:"Rechnungen & Nebenkosten",family:"Familie",education:"Bildung",transport:"Auto & Mobilität",insurance:"Versicherung & Gesundheit",subs:"Abos",other:"Sonstiges"},
       ecats:{groceries:"Lebensmittel",dining:"Restaurants & Cafés",fuel:"Tanken & Fahrten",shopping:"Shopping & Kleidung",health:"Gesundheit & Apotheke",fun:"Freizeit & Ausgehen",kids:"Kinder",home:"Haushalt",misc:"Sonstiges"},
@@ -796,7 +807,12 @@ button,a,label{touch-action:manipulation}
   let lang=pref("iltizamat_lang","ar"); if(!I[lang]) lang="ar";
   const LANGS=["ar","en","de"], LCODE={ar:"ع",en:"EN",de:"DE"};
   let theme=pref("iltizamat_theme","system");
-  const T=k=>I[lang][k];
+  const CURS={SAR:{ar:"ر.س",en:"SAR",de:"SAR",n:{ar:"ريال",en:"SAR",de:"SAR"}},EUR:{ar:"€",en:"€",de:"€",n:{ar:"يورو",en:"EUR",de:"EUR"}},USD:{ar:"$",en:"$",de:"$",n:{ar:"دولار",en:"USD",de:"USD"}},EGP:{ar:"ج.م",en:"EGP",de:"EGP",n:{ar:"جنيه",en:"EGP",de:"EGP"}}};
+  const CC=()=>{ try{ return state&&CURS[state.currency]?state.currency:"SAR"; }catch(e){ return "SAR"; } };
+  const sym=()=>CURS[CC()][lang];
+  const swc=v=>typeof v==="string"?v.replace(/ر\.س|\bSAR\b/g,sym()):Array.isArray(v)?v.map(swc):v;
+  const wrapC=v=>typeof v==="function"?(...a)=>swc(v(...a)):swc(v);
+  const T=k=>wrapC(I[lang][k]);
   const MONTHS=()=>T("months_");
 
   /* ================= categories ================= */
@@ -825,7 +841,7 @@ button,a,label{touch-action:manipulation}
   let selecting=false, visibleIds=[]; const sel=new Set();
   let ready=false, editing=null, editingExp=null, filter="all", efilter="all", view="month", sub="obl", mode="local", statusKey="";
   function normalize(s){
-    const out={v:3,months:{}};
+    const out={v:3,months:{},currency:s&&typeof s==="object"&&CURS[s.currency]?s.currency:"SAR"};
     if(!s||typeof s!=="object"||!s.months) return out;
     for(const [k,mo] of Object.entries(s.months)){
       if(!/^\d{4}-\d{2}$/.test(k)||!mo) continue;
@@ -1001,10 +1017,13 @@ button,a,label{touch-action:manipulation}
     ["prevM","aPrev"].forEach(i=>{ $(i).textContent=pv; $(i).setAttribute("aria-label",T("prevAria")); });
     ["nextM","aNext"].forEach(i=>{ $(i).textContent=nx; $(i).setAttribute("aria-label",T("nextAria")); });
     document.querySelectorAll("#segLang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===lang));
+    appliedCur=CC(); document.querySelectorAll("#segCur button").forEach(b=>{ b.textContent=CURS[b.dataset.v].n[lang]; b.setAttribute("aria-pressed",b.dataset.v===appliedCur); });
     buildPickers(); setAuthMode(authMode);
     if(statusKey) setStatus(statusKey);
     if(!$("setSheet").hidden) fillSettings();
   }
+  let appliedCur=null;
+  function setCur(c){ if(!CURS[c]||c===CC()) return; state.currency=c; persist(); applyLang(); if(!$("app").hidden) render(); }
   function setLang(l){ lang=l; setPref("iltizamat_lang",l); applyLang(); if(!$("app").hidden) render(); pushSyncLang(); }
 
   /* ================= derived ================= */
@@ -1029,9 +1048,10 @@ button,a,label{touch-action:manipulation}
 
   /* ================= render ================= */
   function render(){
+    if(appliedCur!==CC()) applyLang();
     if($("app").hidden) return;
     $("viewMonth").hidden=view!=="month"; $("viewAna").hidden=view!=="ana"; $("viewHist").hidden=view!=="hist";
-    if(view!=="month"||sub!=="obl") selecting=false;
+    if(view!=="month") selecting=false;
     $("addBtn").hidden=view!=="month"||selecting;
     $("selBar").hidden=!selecting;
     $("fabLabel").textContent=sub==="exp"?T("newExp"):T("newOb");
@@ -1078,8 +1098,7 @@ button,a,label{touch-action:manipulation}
     const unpaid=mo.items.filter(i=>!i.paid).length;
     $("countV").textContent=mo.items.length?(unpaid?T("left")(unpaid,mo.items.length):T("allPaid")):"";
     const ul=$("list"); ul.innerHTML=""; ul.classList.toggle("selecting",selecting);
-    visibleIds=items.map(i=>i.id);
-    for(const id of [...sel]) if(!mo.items.some(i=>i.id===id)) sel.delete(id);
+    if(sub==="obl"){ visibleIds=items.map(i=>i.id); for(const id of [...sel]) if(!mo.items.some(i=>i.id===id)) sel.delete(id); }
     $("selBtn").hidden=!mo.items.length; $("selBtn").textContent=selecting?T("cancel"):T("select");
     renderSel();
     for(const it of items){
@@ -1142,8 +1161,12 @@ button,a,label{touch-action:manipulation}
     if(efilter!=="all"&&!cats.find(c=>c.k===efilter)) efilter="all";
     chips($("expFilters"),cats,efilter,f=>{efilter=f;render();});
 
-    const list=$("expList"); list.innerHTML="";
+    const list=$("expList"); list.innerHTML=""; list.classList.toggle("selecting",selecting);
     const ex=mo.expenses.filter(e=>efilter==="all"||ecatOf(e.cat).k===efilter).sort((a,b)=>b.date.localeCompare(a.date));
+    if(sub==="exp"){ visibleIds=ex.map(e=>e.id); for(const id of [...sel]) if(!mo.expenses.some(e=>e.id===id)) sel.delete(id); }
+    if(selecting&&sub==="exp") renderSel();
+    $("selBtnE").hidden=!mo.expenses.length; $("selBtnE").textContent=selecting?T("cancel"):T("select");
+    $("expCount").textContent=mo.expenses.length?String(mo.expenses.length):"";
     if(!ready){ list.innerHTML='<div class="empty"><p>'+T("loading")+'</p></div>'; return; }
     if(!mo.expenses.length){ list.innerHTML='<div class="empty"><p>'+esc(T("expEmpty"))+'</p></div>'; return; }
     const dfmt=new Intl.DateTimeFormat(lang==="ar"?"ar-EG-u-nu-latn":lang==="de"?"de-DE":"en-US",{weekday:"long",day:"numeric",month:"long"});
@@ -1154,9 +1177,10 @@ button,a,label{touch-action:manipulation}
       g.innerHTML='<div class="dayhead"><span>'+esc(dfmt.format(new Date(yy,mm-1,dd)))+'</span><span class="num">'+fmt(sum(groups[d],e=>e.amount))+'</span></div>';
       for(const e of groups[d]){
         const c=ecatOf(e.cat);
-        const b=document.createElement("button"); b.type="button"; b.className="exprow glass";
-        b.innerHTML='<span class="ic" style="background:color-mix(in srgb,'+c.c+' 16%,transparent)"><i style="background:'+c.c+'"></i></span><span class="tx"><b>'+esc(e.note||ecatName(e.cat))+'</b><span>'+(e.note?esc(ecatName(e.cat)):'')+'</span></span><span class="am num">'+fmt(e.amount)+'</span>';
-        b.onclick=()=>openExp(e.id);
+        const b=document.createElement("button"); b.type="button"; b.className="exprow glass"+(sel.has(e.id)?" is-sel":"");
+        if(selecting) b.setAttribute("aria-pressed",String(sel.has(e.id)));
+        b.innerHTML='<span class="esel" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg></span><span class="ic" style="background:color-mix(in srgb,'+c.c+' 16%,transparent)"><i style="background:'+c.c+'"></i></span><span class="tx"><b>'+esc(e.note||ecatName(e.cat))+'</b><span>'+(e.note?esc(ecatName(e.cat)):'')+'</span></span><span class="am num">'+fmt(e.amount)+'</span>';
+        b.onclick=()=>{ if(!selecting) return openExp(e.id); sel.has(e.id)?sel.delete(e.id):sel.add(e.id); b.classList.toggle("is-sel",sel.has(e.id)); b.setAttribute("aria-pressed",String(sel.has(e.id))); renderSel(); };
         g.appendChild(b);
       }
       list.appendChild(g);
@@ -1319,7 +1343,7 @@ button,a,label{touch-action:manipulation}
       rAuto:a=>["Überschuss arbeiten lassen","Dir bleiben "+a+" SAR. Überweise automatisch einen festen Teil in einen Notgroschen für 3–6 Monatsausgaben."]
     }
   };
-  const AT=k=>A[lang][k];
+  const AT=k=>wrapC(A[lang][k]);
 
   function analyze(k){
     const mo=peek(k)||{salary:0,budget:0,items:[],expenses:[]}; const t=totals(mo); const S=t.salary;
@@ -1618,6 +1642,7 @@ button,a,label{touch-action:manipulation}
     r.readAsText(f);
   });
   document.querySelectorAll("#segLang button").forEach(b=>b.onclick=()=>setLang(b.dataset.v));
+  document.querySelectorAll("#segCur button").forEach(b=>b.onclick=()=>setCur(b.dataset.v));
   document.querySelectorAll("#segTheme button").forEach(b=>b.onclick=()=>{ theme=b.dataset.v; setPref("iltizamat_theme",theme); applyTheme(); });
 
   /* ================= toast ================= */
@@ -1635,6 +1660,7 @@ button,a,label{touch-action:manipulation}
     if(!n) $("selConfirm").innerHTML="";
   }
   $("selBtn").onclick=()=>setSelecting(!selecting);
+  $("selBtnE").onclick=()=>setSelecting(!selecting);
   $("selCancel").onclick=()=>setSelecting(false);
   $("selAll").onclick=()=>{
     const all=visibleIds.length>0&&visibleIds.every(id=>sel.has(id));
@@ -1644,9 +1670,9 @@ button,a,label{touch-action:manipulation}
   $("selDel").onclick=()=>{
     const n=sel.size; if(!n) return;
     const box=$("selConfirm"); box.innerHTML="";
-    const d=document.createElement("div"); d.className="confirm"; d.innerHTML="<span>"+esc(T("confirmDelN")(n))+"</span>";
+    const d=document.createElement("div"); d.className="confirm"; d.innerHTML="<span>"+esc(T(sub==="exp"?"confirmDelE":"confirmDelN")(n))+"</span>";
     const yb=document.createElement("button"); yb.type="button"; yb.className="btn danger"; yb.textContent=T("yesDel");
-    yb.onclick=()=>{ const mo=month(keyOf(cur)); mo.items=mo.items.filter(i=>!sel.has(i.id)); persist(); setSelecting(false); toast(T("deletedN")(n)); };
+    yb.onclick=()=>{ const mo=month(keyOf(cur)), isE=sub==="exp"; if(isE) mo.expenses=mo.expenses.filter(e=>!sel.has(e.id)); else mo.items=mo.items.filter(i=>!sel.has(i.id)); persist(); setSelecting(false); toast(T(isE?"deletedE":"deletedN")(n)); };
     d.appendChild(yb); box.appendChild(d);
   };
 
@@ -1826,7 +1852,7 @@ button,a,label{touch-action:manipulation}
   $("langBtn").onclick=()=>setLang(nextLang()); $("authLang").onclick=()=>setLang(nextLang());
   $("themeBtn").onclick=()=>{ theme=isDark()?"light":"dark"; setPref("iltizamat_theme",theme); applyTheme(); };
   $("tabMonth").onclick=()=>{ view="month"; render(); }; $("tabAna").onclick=()=>{ view="ana"; render(); }; $("tabHist").onclick=()=>{ view="hist"; render(); };
-  document.querySelectorAll("#subSeg button").forEach(b=>b.onclick=()=>{ sub=b.dataset.v; render(); });
+  document.querySelectorAll("#subSeg button").forEach(b=>b.onclick=()=>{ if(sub!==b.dataset.v){ sub=b.dataset.v; selecting=false; sel.clear(); $("selConfirm").innerHTML=""; } render(); });
   const shift=d=>{ cur=new Date(cur.getFullYear(),cur.getMonth()+d,1); filter="all"; efilter="all"; selecting=false; sel.clear(); render(); };
   $("prevM").onclick=()=>shift(-1); $("nextM").onclick=()=>shift(1); $("aPrev").onclick=()=>shift(-1); $("aNext").onclick=()=>shift(1);
 
